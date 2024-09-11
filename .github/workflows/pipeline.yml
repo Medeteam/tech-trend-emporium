@@ -28,7 +28,7 @@ jobs:
       - name: Build
         run: dotnet build ./emporium/emporium.sln --configuration Release --no-restore
       - name: Test
-        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+        run: dotnet test ./emporium/emporium.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
       - name: Publish
         run: dotnet publish ./emporium/emporium.sln --configuration Release --no-build
       
