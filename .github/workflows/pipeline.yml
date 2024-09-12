@@ -56,5 +56,5 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           .sonar/scanner/dotnet-sonarscanner begin /k:"Medeteam_tech-trend-emporium" /o:"medeteam-1" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"  /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
-          dotnet build
+          dotnet build ./emporium/emporium.sln
           .sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
