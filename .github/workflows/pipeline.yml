@@ -79,16 +79,16 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { context } = require('@actions/github');
-            const status = context.payload.workflow_run.conclusion;
-            const sha = context.sha;
-            const ref = context.ref;
-            const repo = context.repo.repo;
-            const owner = context.repo.owner;
+            const commitContext = require('@actions/github');
+            const status = commitContext.payload.workflow_run.conclusion;
+            const sha = commitContext.sha;
+            const ref = commitContext.ref;
+            const repo = commitContext.repo.repo;
+            const owner = commitContext.repo.owner;
             const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
             await github.rest.issues.createComment({
               owner,
               repo,
-              issue_number: context.issue.number,
+              issue_number: commitContext.issue.number,
               body: comment
             });
