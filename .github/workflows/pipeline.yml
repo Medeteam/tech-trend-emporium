@@ -75,3 +75,21 @@ jobs:
           context: .
           push: true
           tags: ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:${{ env.SHORT_SHA }}
+      - name: Generate report
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: runs } = await github.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            const report = runs.workflow_runs.map(run => ({
+              id: run.id,
+              name: run.name,
+              status: run.status,
+              conclusion: run.conclusion,
+              created_at: run.created_at,
+              updated_at: run.updated_at
+            }));
+            console.log(report);
