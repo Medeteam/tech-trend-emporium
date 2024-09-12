@@ -77,22 +77,34 @@ jobs:
       #     context: .
       #     push: true
       #     tags: ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:${{ env.SHORT_SHA }}
-      - name: Post status comment
-        uses: actions/github-script@v6
+      # - name: Post status comment
+      #   uses: actions/github-script@v6
+      #   with:
+      #     script: |
+      #       const github = require('@actions/github');
+      #       const commitContext = github.context;
+      #       const status = commitContext.payload.workflow_run.conclusion;
+      #       const sha = commitContext.sha;
+      #       const ref = commitContext.ref;
+      #       const repo = commitContext.repo.repo;
+      #       const owner = commitContext.repo.owner;
+      #       const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
+      #       await github.rest.issues.createComment({
+      #         owner,
+      #         repo,
+      #         issue_number: commitContext.issue.number,
+      #         body: comment
+      #       });
+      - name: Generate report
+        run: |
+          echo "Pipeline Status: ${{ job.status }}" > report.txt
+          echo "Commit: ${{ github.sha }}" >> report.txt
+          echo "Branch: ${{ github.ref }}" >> report.txt
+          echo "Repository: ${{ github.repository }}" >> report.txt
+
+      - name: Upload report
+        uses: actions/upload-artifact@v3
         with:
-          script: |
-            const github = require('@actions/github');
-            const commitContext = github.context;
-            const status = commitContext.payload.workflow_run.conclusion;
-            const sha = commitContext.sha;
-            const ref = commitContext.ref;
-            const repo = commitContext.repo.repo;
-            const owner = commitContext.repo.owner;
-            const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number: commitContext.issue.number,
-              body: comment
-            });
+          name: pipeline-report
+          path: report.txt
         
