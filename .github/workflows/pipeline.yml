@@ -108,22 +108,20 @@ jobs:
       #   with:
       #     name: pipeline-report
       #     path: report.txt
-      
-      - name: Generate report
+        
+      - name: Post status comment
         uses: actions/github-script@v6
         with:
           script: |
-            const { data: runs } = await github.actions.listWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100
+            const status = process.env.GITHUB_WORKFLOW_CONCLUSION;
+            const sha = process.env.GITHUB_SHA;
+            const ref = process.env.GITHUB_REF;
+            const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
+            const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
+            const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: context.issue.number,
+              body: comment
             });
-            const report = runs.workflow_runs.map(run => ({
-              id: run.id,
-              name: run.name,
-              status: run.status,
-              conclusion: run.conclusion,
-              created_at: run.created_at,
-              updated_at: run.updated_at
-            }));
-            console.log(report);
