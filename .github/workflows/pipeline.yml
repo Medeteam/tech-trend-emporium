@@ -95,16 +95,35 @@ jobs:
       #         issue_number: commitContext.issue.number,
       #         body: comment
       #       });
-      - name: Generate report
-        run: |
-          echo "Pipeline Status: ${{ job.status }}" > report.txt
-          echo "Commit: ${{ github.sha }}" >> report.txt
-          echo "Branch: ${{ github.ref }}" >> report.txt
-          echo "Repository: ${{ github.repository }}" >> report.txt
 
-      - name: Upload report
-        uses: actions/upload-artifact@v4
+      # - name: Generate report
+      #   run: |
+      #     echo "Pipeline Status: ${{ job.status }}" > report.txt
+      #     echo "Commit: ${{ github.sha }}" >> report.txt
+      #     echo "Branch: ${{ github.ref }}" >> report.txt
+      #     echo "Repository: ${{ github.repository }}" >> report.txt
+
+      # - name: Upload report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: pipeline-report
+      #     path: report.txt
+      
+      - name: Generate report
+        uses: actions/github-script@v6
         with:
-          name: pipeline-report
-          path: report.txt
-        
+          script: |
+            const { data: runs } = await github.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+            const report = runs.workflow_runs.map(run => ({
+              id: run.id,
+              name: run.name,
+              status: run.status,
+              conclusion: run.conclusion,
+              created_at: run.created_at,
+              updated_at: run.updated_at
+            }));
+            console.log(report);
