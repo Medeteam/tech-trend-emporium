@@ -5,12 +5,12 @@ WORKDIR /src
 # Copy the solution file and restore dependencies
 COPY emporium/*.sln ./
 COPY emporium/app/*.csproj ./app/
-COPY emporium/data/*.csproj ./data/
+COPY emporium/Data/*.csproj ./Data/
 RUN dotnet restore
 
 # Copy the rest of the application code
 COPY emporium/app/. ./app/
-COPY emporium/data/. ./data/
+COPY emporium/Data/. ./Data/
 WORKDIR /src/app
 RUN dotnet build -c Release -o /app/build
 
