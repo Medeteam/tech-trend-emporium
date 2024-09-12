@@ -81,7 +81,8 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const commitContext = require('@actions/github').context;
+            const github = require('@actions/github');
+            const commitContext = github.context;
             const status = commitContext.payload.workflow_run.conclusion;
             const sha = commitContext.sha;
             const ref = commitContext.ref;
