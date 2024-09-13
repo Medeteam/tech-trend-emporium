@@ -2,7 +2,7 @@ name: Follow-Up Workflow
 
 on:
   workflow_run:
-    workflows: ["Pipeline CI"] 
+    workflows: [Pipeline CI] 
     types:
       - completed
 permissions:
