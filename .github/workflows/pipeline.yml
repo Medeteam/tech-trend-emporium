@@ -1,4 +1,4 @@
-name: SonarCloud
+name: CICDPipeline
 on:
   push:
     branches:
@@ -33,7 +33,24 @@ jobs:
         run: dotnet test ./emporium/emporium.sln --configuration Release --no-build --no-restore --collect:"XPlat Code Coverage"
       - name: Publish
         run: dotnet publish ./emporium/emporium.sln --configuration Release --no-build
-      
+      - name: Post commit status comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = process.env.GITHUB_WORKFLOW_CONCLUSION;
+            const sha = process.env.GITHUB_SHA;
+            const ref = process.env.GITHUB_REF;
+            const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
+            const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
+            const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
+            
+            // Create a commit comment instead of issue comment
+            await github.rest.repos.createCommitComment({
+              owner: owner,
+              repo: repo,
+              commit_sha: sha,
+              body: comment
+            });
       # - name: Cache SonarCloud packages
       #   uses: actions/cache@v3
       #   with:
@@ -109,25 +126,4 @@ jobs:
       #     name: pipeline-report
       #     path: report.txt
         
-  post-comment:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Post commit status comment
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const status = process.env.GITHUB_WORKFLOW_CONCLUSION;
-            const sha = process.env.GITHUB_SHA;
-            const ref = process.env.GITHUB_REF;
-            const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
-            const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
-            const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
-            
-            // Create a commit comment instead of issue comment
-            await github.rest.repos.createCommitComment({
-              owner: owner,
-              repo: repo,
-              commit_sha: sha,
-              body: comment
-            });
+  
