@@ -1,0 +1,30 @@
+name: Follow-Up Workflow
+
+on:
+  workflow_run:
+    workflows: [CICDPipeline]
+    types: [completed]
+permissions:
+  contents: write
+  id-token: write
+jobs:
+  reports:
+    name: Comment Commit
+    runs-on: ubuntu-latest
+    steps: 
+      - name: commenting the action
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = process.env.GITHUB_WORKFLOW_CONCLUSION;
+            const sha = github.event.workflow_run.head_commit.id;
+            const ref = process.env.GITHUB_REF;
+            const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
+            const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
+            const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
+            await github.rest.repos.createCommitComment({
+              owner: owner,
+              repo: repo,
+              commit_sha: sha,
+              body: comment
+            });
