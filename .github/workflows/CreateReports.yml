@@ -1,10 +1,12 @@
-name: Follow-Up Workflow
+name: Comment Commit changes
 
 on:
   workflow_run:
     workflows: [CICDPipeline]
     types:
       - completed
+    branches: 
+      - Features/*
 
 permissions:
   contents: write
