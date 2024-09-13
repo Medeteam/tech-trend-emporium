@@ -18,18 +18,27 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Comment on Commit
-        uses: actions/github-script@v7
+        uses: actions/github-script@v6
         with:
           script: |
-            const status = process.env.GITHUB_WORKFLOW_CONCLUSION;
-            const sha = github.event.workflow_run.head_commit.id;  
-            const ref = github.event.workflow_run.head_commit.tree_id;  
-            const repo = github.repository.split('/')[1];
-            const owner = github.repository.split('/')[0];
-            const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
-            await github.rest.repos.createCommitComment({
-              owner: owner,
-              repo: repo,
-              commit_sha: sha,
-              body: comment
-            });
+            const fs = require('fs');
+            const eventPath = process.env.GITHUB_EVENT_PATH;  
+            const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));  
+            const workflowRun = event.workflow_run;
+            if (workflowRun) {
+              const status = process.env.GITHUB_WORKFLOW_CONCLUSION || workflowRun.conclusion;
+              const sha = workflowRun.head_commit.id;
+              const ref = workflowRun.head_commit.tree_id;
+              const repo = event.repository.name;
+              const owner = event.repository.owner.login;
+              const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
+              
+              await github.rest.repos.createCommitComment({
+                owner: owner,
+                repo: repo,
+                commit_sha: sha,
+                body: comment
+              });
+            } else {
+              console.error("workflow_run is undefined");
+            }
