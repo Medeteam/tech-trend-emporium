@@ -109,34 +109,25 @@ jobs:
       #     name: pipeline-report
       #     path: report.txt
         
-      - name: Generate report
-        id: generate_report
-        run: |
-          echo "Pipeline Status: ${{ job.status }}" > report.txt
-          echo "Commit: ${{ github.sha }}" >> report.txt
-          echo "Branch: ${{ github.ref }}" >> report.txt
-          echo "Repository: ${{ github.repository }}" >> report.txt
-          cat report.txt
+  post-comment:
+    runs-on: ubuntu-latest
 
-      - name: Upload report
-        uses: actions/upload-artifact@v4
-        with:
-          name: pipeline-report
-          path: report.txt
-
-      - name: Post commit comment
+    steps:
+      - name: Post commit status comment
         uses: actions/github-script@v6
         with:
           script: |
-            const github = require('@actions/github');
-            const fs = require('fs');
-            const context = github.context;
-            const report = fs.readFileSync('report.txt', 'utf8');
-            const { owner, repo } = context.repo;
-            const sha = context.sha;
+            const status = process.env.GITHUB_WORKFLOW_CONCLUSION;
+            const sha = process.env.GITHUB_SHA;
+            const ref = process.env.GITHUB_REF;
+            const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
+            const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
+            const comment = `Pipeline Status: ${status}\nCommit: ${sha}\nBranch: ${ref}\nRepository: ${owner}/${repo}`;
+            
+            // Create a commit comment instead of issue comment
             await github.rest.repos.createCommitComment({
-              owner,
-              repo,
+              owner: owner,
+              repo: repo,
               commit_sha: sha,
-              body: report
+              body: comment
             });
