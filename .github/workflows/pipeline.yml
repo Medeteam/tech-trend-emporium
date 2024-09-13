@@ -5,7 +5,7 @@ on:
       - main
       - Feature/CI-pipeline
 permissions:
-  contents: read
+  contents: write
   id-token: write
 jobs:
   build:
