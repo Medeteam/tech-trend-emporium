@@ -2,7 +2,7 @@ name: Follow-Up Workflow
 
 on:
   workflow_run:
-    workflows: [CICDPipeline] 
+    workflows: [CICDPipeline]
     types:
       - completed
 permissions:
@@ -10,14 +10,15 @@ permissions:
   id-token: write
 jobs:
   reports:
+    name: Comment Commit
     runs-on: ubuntu-latest
     steps: 
-      - name: comment commit
+      - name: commenting the action
         uses: actions/github-script@v6
         with:
           script: |
             const status = process.env.GITHUB_WORKFLOW_CONCLUSION;
-            const sha = process.env.GITHUB_SHA;
+            const sha = github.event.workflow_run.head_commit.id;
             const ref = process.env.GITHUB_REF;
             const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
             const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
