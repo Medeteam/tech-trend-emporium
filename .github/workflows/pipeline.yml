@@ -5,7 +5,8 @@ on:
       - main
   pull_request: 
     branches: 
-      - Feature/*
+      - main
+    types: [opened, synchronize, reopened]
 permissions:
   contents: read
   id-token: write
