@@ -3,8 +3,7 @@ name: Follow-Up Workflow
 on:
   workflow_run:
     workflows: [CICDPipeline]
-    types:
-      - completed
+    types: [completed]
 permissions:
   contents: write
   id-token: write
