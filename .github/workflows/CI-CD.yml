@@ -83,7 +83,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:${{ env.SHORT_SHA }}
+          tags: |
+            ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:${{ env.SHORT_SHA }}
+            ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:latest
   deploy: 
     runs-on: self-hosted
     needs: [build_push]
