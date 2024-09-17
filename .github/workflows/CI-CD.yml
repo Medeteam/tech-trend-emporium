@@ -97,4 +97,4 @@ jobs:
         docker stop app || true
         docker rm app || true
     - name: Run Docker Container
-      run: docker run -d -p 3000:3000 --name app ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:latest
+      run: docker run -d -p 8080:8080 --name app ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:latest
