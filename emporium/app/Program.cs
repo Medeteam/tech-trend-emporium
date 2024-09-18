@@ -1,4 +1,8 @@
 
+using Data;
+using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
+
 namespace app
 {
     public class Program
@@ -6,6 +10,16 @@ namespace app
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            DotNetEnv.Env.Load();
+
+            string connectionString = Environment.GetEnvironmentVariable("SQLSERVER_CONNECTION_STRING");
+
+
+            builder.Services.AddDbContext<DBContextTechEmporiumTrend>(
+                options=>options.UseSqlServer(connectionString)
+                
+                );
 
             // Add services to the container.
 
