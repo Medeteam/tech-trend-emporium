@@ -1,6 +1,4 @@
 
-<<<<<<< Updated upstream
-=======
 using Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
@@ -8,7 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
->>>>>>> Stashed changes
 namespace app
 {
     public class Program
@@ -18,8 +15,6 @@ namespace app
         {
             var builder = WebApplication.CreateBuilder(args);
 
-<<<<<<< Updated upstream
-=======
             DotNetEnv.Env.Load();
 
             string connectionString = Environment.GetEnvironmentVariable("SQLSERVER_CONNECTION_STRING");
@@ -32,7 +27,6 @@ namespace app
                 
                 );
 
->>>>>>> Stashed changes
             // Add services to the container.
 
             builder.Services.AddControllers();
