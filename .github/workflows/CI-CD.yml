@@ -83,4 +83,18 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:${{ env.SHORT_SHA }}
+          tags: |
+            ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:${{ env.SHORT_SHA }}
+            ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:latest
+  deploy: 
+    runs-on: self-hosted
+    needs: [build_push]
+    steps:
+    - name: Pull Docker Image
+      run: docker pull ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:latest
+    - name: Stop and remove previous images
+      run: |
+        docker stop app || true
+        docker rm app || true
+    - name: Run Docker Container
+      run: docker run -d -p 8080:8080 --name app ${{secrets.DOCKER_USERNAME }}/tech-trend-emporium:latest
