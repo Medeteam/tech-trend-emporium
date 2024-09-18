@@ -9,6 +9,7 @@ using DotNetEnv;
 using System.Security.Claims;
 using Data;
 using System.IdentityModel.Tokens.Jwt;
+using Data.DataForTest;
 
 namespace App.Controllers
 {
@@ -29,7 +30,7 @@ namespace App.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("login")]
+        [HttpPost]
         public IActionResult Login([FromBody] UserLoginDto userLogin)
         {
             var user = AuthenticateUser(userLogin);
@@ -66,9 +67,19 @@ namespace App.Controllers
 
         private User? AuthenticateUser(UserLoginDto userLogin)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username 
-                && u.Password == userLogin.Password);
-            return user is not null ? user : null;
+            // Real search
+            //var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username 
+            //    && u.Password == userLogin.Password);
+            //return user is not null ? user : null;
+
+            // Test search
+            var currentUser = UserConstants.Users.FirstOrDefault(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password);
+
+            if (currentUser != null)
+            {
+                return currentUser;
+            }
+            return null;
         }
     }
 }
