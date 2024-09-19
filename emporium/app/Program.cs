@@ -49,7 +49,11 @@ namespace app
                     };
                 });
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("RequireEmployeeOrSuperiorRole", policy => policy.RequireRole("Admin", "Employee"));
+            });
 
             var app = builder.Build();
 
@@ -62,8 +66,9 @@ namespace app
 
             app.UseHttpsRedirection();
 
+            // Use authentication and autorization services
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 
