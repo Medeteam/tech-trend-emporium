@@ -38,6 +38,14 @@ namespace App.Controllers
             if (user != null)
             {
                 var token = GenerateJWTToken(user);
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true, // La cookie no puede ser accedida desde JavaScript
+                    SameSite = SameSiteMode.Strict, // Protección contra CSRF
+                    Expires = DateTime.Now.AddMinutes(120) // Tiempo de vida de la cookie
+                };
+
+                Response.Cookies.Append("Autorization", token, cookieOptions); // Añadir el token a la cookie
                 return Ok(token);
             }
 
