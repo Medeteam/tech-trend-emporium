@@ -13,13 +13,11 @@ namespace App.Controllers
     {
         private readonly FakeStoreService _fakeStoreService;
         private readonly DBContextTechEmporiumTrend _context;
-        private readonly Random _random;
 
         public ProductController(FakeStoreService fakeStoreService, DBContextTechEmporiumTrend context)
         {
             _fakeStoreService = fakeStoreService;
             _context = context;
-            _random = new Random();
         }
 
         [HttpPost("sync-products")]
@@ -28,15 +26,16 @@ namespace App.Controllers
             // Obtener los productos desde la Fake Store API
             var productsFromApi = await _fakeStoreService.GetProductsAsync();
 
-            // Obtener todos los usuarios disponibles
-            var users = _context.Users.ToList();
+            // Buscar al usuario específico "JhonatanT"
+            var User = _context.Users.FirstOrDefault(u => u.Username == "JhonatanT");
 
-            // Obtener el shopping status 'Accepted'
+            // Obtener el estado de trabajo 'Accepted'
             var acceptedStatus = _context.Jobs.FirstOrDefault(js => js.Job_status == "Accepted");
 
-            if (!users.Any() || acceptedStatus == null)
+            // Validar si se encontró el usuario y el estado
+            if (User == null || acceptedStatus == null)
             {
-                return BadRequest("Es necesario tener usuarios y un estatus 'Accepted' antes de sincronizar productos.");
+                return BadRequest("Es necesario tener el usuario 'JhonatanT' y un estado de trabajo 'Accepted' antes de sincronizar productos.");
             }
 
             // Filtrar los productos que aún no existen en la base de datos
@@ -51,7 +50,7 @@ namespace App.Controllers
                     Image = apiProduct.Image, // Mapeo directo desde la API
                     Price = apiProduct.Price, // Mapeo directo desde la API
                     Stock = 5, // Asignar un stock predeterminado
-                    User_id = users[_random.Next(users.Count)].User_id, // Seleccionar aleatoriamente un usuario de la lista
+                    User_id = User.User_id, // Asignar siempre el User_id de "JhonatanT"
                     Job_status_id = acceptedStatus.Job_status_id, // Siempre asignar el estatus 'Accepted'
                     Wishlist_id = null // Mantener la wishlist vacía
                 })
@@ -86,7 +85,7 @@ namespace App.Controllers
                 price = p.Price,
                 stock = p.Stock,
                 created_at = p.Created_at,
-                username =  p.User.Username , 
+                username = p.User.Username,
                 job_status = p.Job_status.Job_status,
             }).ToList();
 
