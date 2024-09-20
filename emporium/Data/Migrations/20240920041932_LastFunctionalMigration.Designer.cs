@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DBContextTechEmporiumTrend))]
-    [Migration("20240920010641_CategoryFixed")]
-    partial class CategoryFixed
+    [Migration("20240920041932_LastFunctionalMigration")]
+    partial class LastFunctionalMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

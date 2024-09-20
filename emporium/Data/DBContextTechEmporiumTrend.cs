@@ -16,8 +16,8 @@ namespace Data
         public DbSet<ProductToCategory> ProductToCategories { get; set; }
         public DbSet<WishList> WishList { get; set; }
         public DbSet<Cart> Carts { get; set; }
-        public DbSet<ProductToCart> ProductsToCart {  get; set; } 
-        public DbSet<Order> Orders { get; set; }  
+        public DbSet<ProductToCart> ProductsToCart {  get; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<ShoppingStatus> ShoppingStatus { get; set; }
         public DbSet<Coupon> Coupons { get; set; }
 
@@ -79,7 +79,7 @@ namespace Data
                 .HasOne(o => o.Cart)
                 .WithOne(c => c.Order)
                 .HasForeignKey<Order>(o => o.Cart_id)  // La clave foránea está en Orders
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Relación entre Orders y ShoppingStatus
             modelBuilder.Entity<Order>()
@@ -93,7 +93,7 @@ namespace Data
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.User_id)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Relación entre Products y WishList (sin cascada)
             modelBuilder.Entity<Product>()

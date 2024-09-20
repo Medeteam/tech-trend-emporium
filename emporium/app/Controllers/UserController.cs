@@ -20,69 +20,7 @@ namespace App.Controllers
             _passwordHasher = new PasswordHasher<User>();
         }
 
-        [HttpPost("Create-Admin-Users")]
-        public async Task<IActionResult> CreateAdminUsers()
-        {
-            // Verificar si existe el rol de Admin
-            var adminRole = _context.Roles.FirstOrDefault(r => r.RoleName == "Admin");
-            if (adminRole == null)
-            {
-                return BadRequest("Admin role not found");
-            }
-
-            var usersToCreate = new List<User>
-            {
-            new User
-                {
-                    User_id = Guid.NewGuid(),
-                    Username = "CamiloVelezP",
-                    Email = "CamiVelezP@gmail.com",
-                    Password = "EndInterns20242",
-                    Role_id = adminRole.Role_id
-                },
-                new User
-                {
-                    User_id = Guid.NewGuid(),
-                    Username = "JhonatanT",
-                    Email = "JhonatanT@gmail.com",
-                    Password = "EndInterns20242",
-                    Role_id = adminRole.Role_id
-                },
-                new User
-                {
-                    User_id = Guid.NewGuid(),
-                    Username = "Sariasu",
-                    Email = "SebasAriasU@Gmail.com",
-                    Password = "EndInterns20242",
-                    Role_id = adminRole.Role_id
-                }
-            };
-            
-
-            foreach (var user in usersToCreate)
-            {
-                // Verificar si ya existe un usuario con el mismo Email o Username
-                var existingUser = _context.Users
-                    .FirstOrDefault(u => u.Email == user.Email || u.Username == user.Username);
-
-                if (existingUser != null)
-                {
-                    return Ok("Los usuarios ya existen");
-                }
-
-                // Hashear la contraseña antes de guardar
-                user.Password = _passwordHasher.HashPassword(user, user.Password);
-
-                // Añadir el usuario a la base de datos
-                _context.Users.Add(user);
-            }
-
-            // Guardar los cambios
-            await _context.SaveChangesAsync();
-
-            return Ok("Usuarios administradores creados con éxito.");
-        }
-
+        // Método para obtener todos los usuarios (ya implementado)
         [HttpGet("GetUsers")]
         public IActionResult GetAllUsers()
         {
@@ -92,11 +30,53 @@ namespace App.Controllers
                     u.User_id,
                     u.Username,
                     u.Email,
-                    Role = u.Role.RoleName, // Mostrar el nombre del rol
+                    Role = u.Role.RoleName
                 })
                 .ToList();
 
             return Ok(users);
+        }
+
+        // Obtener un solo usuario por ID
+        [HttpGet("GetUser/{id}")]
+        public IActionResult GetUserById(Guid id)
+        {
+            var user = _context.Users
+                .Where(u => u.User_id == id)
+                .Select(u => new
+                {
+                    u.User_id,
+                    u.Username,
+                    u.Email,
+                    Role = u.Role.RoleName
+                })
+                .FirstOrDefault();
+
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            return Ok(user);
+        }
+
+
+
+        // Método para eliminar un usuario por ID
+        [HttpDelete("DeleteUser/{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.User_id == id);
+
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("Usuario eliminado con éxito.");
         }
     }
 }

@@ -28,10 +28,8 @@ namespace App.Controllers
             // Obtener las categorías desde la API de FakeStore
             var categoriesFromApi = await _fakeStoreService.GetCategoriesAsync();
 
-            // Obtener todos los usuarios disponibles
             var users = _context.Users.ToList();
 
-            // Obtener el estado de trabajo 'Accepted'
             var acceptedStatus = _context.Jobs.FirstOrDefault(js => js.Job_status == "Accepted");
 
             if (!users.Any() || acceptedStatus == null)
@@ -72,16 +70,16 @@ namespace App.Controllers
         public IActionResult GetCategories()
         {
             var categories = _context.Categories
-                .Include(c => c.User) // Incluir el usuario relacionado
-                .Include(c => c.Job_status) // Incluir el estado de trabajo relacionado
+                .Include(c => c.User) 
+                .Include(c => c.Job_status) 
                 .Select(c => new
                 {
                     c.Category_id,
                     c.Category_name,
                     c.Category_description,
                     c.Created_at,
-                    UserName = c.User.Username, // Mostrar el nombre del usuario
-                    JobStatus = c.Job_status.Job_status // Mostrar el estado de trabajo
+                    UserName = c.User.Username, 
+                    JobStatus = c.Job_status.Job_status 
                 })
                 .ToList();
 
@@ -91,6 +89,46 @@ namespace App.Controllers
             }
 
             return Ok(categories);
+        }
+
+        [HttpGet("GetCategory/{id}")]
+        public IActionResult GetCategoryById(Guid id)
+        {
+            var category = _context.Categories
+                .Where(c => c.Category_id == id)
+                .Select(c => new
+                {
+                    c.Category_id,
+                    c.Category_name,
+                    c.Category_description,
+                    c.Created_at,
+                    UserName = c.User.Username, 
+                    JobStatus = c.Job_status.Job_status 
+                })
+                .FirstOrDefault();
+
+            if (category == null)
+            {
+                return NotFound("Categoría no encontrada.");
+            }
+
+            return Ok(category);
+        }
+
+        [HttpDelete("DeleteCategory/{id}")]
+        public async Task<IActionResult> DeleteCategory(Guid id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);
+
+            if (category == null)
+            {
+                return NotFound("Categoría no encontrada.");
+            }
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
+            return Ok("Categoría eliminada con éxito.");
         }
     }
 }

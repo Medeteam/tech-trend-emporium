@@ -55,7 +55,6 @@ namespace App.Controllers
         [HttpGet("get-all-job-statuses")]
         public IActionResult GetAllJobStatuses()
         {
-            // Obtener todos los JobStatus de la base de datos
             var jobStatuses = _context.Jobs.ToList();
 
             if (jobStatuses == null || jobStatuses.Count == 0)
@@ -64,6 +63,36 @@ namespace App.Controllers
             }
 
             return Ok(jobStatuses);
+        }
+
+        [HttpGet("GetJobStatus/{id}")]
+        public IActionResult GetJobStatusById(Guid id)
+        {
+            var jobStatus = _context.Jobs
+                .FirstOrDefault(js => js.Job_status_id == id);
+
+            if (jobStatus == null)
+            {
+                return NotFound("Job status not found.");
+            }
+
+            return Ok(jobStatus);
+        }
+
+        [HttpDelete("DeleteJobStatus/{id}")]
+        public async Task<IActionResult> DeleteJobStatus(Guid id)
+        {
+            var jobStatus = _context.Jobs.FirstOrDefault(js => js.Job_status_id == id);
+
+            if (jobStatus == null)
+            {
+                return NotFound("Job status not found.");
+            }
+
+            _context.Jobs.Remove(jobStatus);
+            await _context.SaveChangesAsync();
+
+            return Ok("Job status deleted successfully.");
         }
     }
 }

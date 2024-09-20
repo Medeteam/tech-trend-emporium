@@ -49,7 +49,7 @@ namespace App.Controllers
             }
         }
 
-        [HttpGet(Name = "GetRole")]
+        [HttpGet("GetRole")]
         public IActionResult GetRoles()
         {
             // Obtener todos los roles desde la base de datos usando LINQ
@@ -61,6 +61,35 @@ namespace App.Controllers
             }
 
             return Ok(roles);
+        }
+
+        [HttpGet("GetRole/{id}")]
+        public IActionResult GetRoleById(Guid id)
+        {
+            var role = _context.Roles.FirstOrDefault(r => r.Role_id == id);
+
+            if (role == null)
+            {
+                return NotFound("Rol no encontrado.");
+            }
+
+            return Ok(role);
+        }
+
+        [HttpDelete("DeleteRole/{id}")]
+        public async Task<IActionResult> DeleteRole(Guid id)
+        {
+            var role = _context.Roles.FirstOrDefault(r => r.Role_id == id);
+
+            if (role == null)
+            {
+                return NotFound("Rol no encontrado.");
+            }
+
+            _context.Roles.Remove(role);
+            await _context.SaveChangesAsync();
+
+            return Ok("Rol eliminado con éxito.");
         }
     }
 }

@@ -63,5 +63,34 @@ namespace App.Controllers
 
             return Ok(shoppingStatuses);
         }
+
+        [HttpGet("GetShoppingStatus/{id}")]
+        public IActionResult GetShoppingStatusById(Guid id)
+        {
+            var shoppingStatus = _context.ShoppingStatus.FirstOrDefault(ss => ss.Shopping_status_id == id);
+
+            if (shoppingStatus == null)
+            {
+                return NotFound("Shopping status not found.");
+            }
+
+            return Ok(shoppingStatus);
+        }
+
+        [HttpDelete("DeleteShoppingStatus/{id}")]
+        public async Task<IActionResult> DeleteShoppingStatus(Guid id)
+        {
+            var shoppingStatus = _context.ShoppingStatus.FirstOrDefault(ss => ss.Shopping_status_id == id);
+
+            if (shoppingStatus == null)
+            {
+                return NotFound("Shopping status not found.");
+            }
+
+            _context.ShoppingStatus.Remove(shoppingStatus);
+            await _context.SaveChangesAsync();
+
+            return Ok("Shopping status deleted successfully.");
+        }
     }
 }

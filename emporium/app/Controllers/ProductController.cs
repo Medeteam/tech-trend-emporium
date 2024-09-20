@@ -92,5 +92,50 @@ namespace App.Controllers
 
             return Ok(productDtos);
         }
+
+        [HttpGet("GetProduct/{id}")]
+        public IActionResult GetProductById(Guid id)
+        {
+            var product = _context.Products
+                .Include(p => p.User)
+                .Include(p => p.Job_status)
+                .Where(p => p.Product_id == id)
+                .Select(p => new
+                {
+                    product_id = p.Product_id,
+                    title = p.Name,
+                    description = p.Description,
+                    image = p.Image,
+                    price = p.Price,
+                    stock = p.Stock,
+                    created_at = p.Created_at,
+                    username = p.User.Username,
+                    job_status = p.Job_status.Job_status
+                })
+                .FirstOrDefault();
+
+            if (product == null)
+            {
+                return NotFound("Producto no encontrado.");
+            }
+
+            return Ok(product);
+        }
+
+        [HttpDelete("DeleteProduct/{id}")]
+        public async Task<IActionResult> DeleteProduct(Guid id)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.Product_id == id);
+
+            if (product == null)
+            {
+                return NotFound("Producto no encontrado.");
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+
+            return Ok("Producto eliminado con éxito.");
+        }
     }
 }
