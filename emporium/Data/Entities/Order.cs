@@ -23,8 +23,8 @@ namespace Data.Entities
         public ShoppingStatus ShoppingStatus { get; set; }
 
         [ForeignKey("Cart")]
-        public Guid Cart_id { get; set; }  // Clave foránea hacia Cart
-        public Cart Cart { get; set; }  // Relación uno a uno con Cart
+        public Guid Cart_id { get; set; }  
+        public Cart Cart { get; set; }  
 
 
     }

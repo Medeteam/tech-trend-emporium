@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DBContextTechEmporiumTrend))]
-    partial class DBContextTechEmporiumTrendModelSnapshot : ModelSnapshot
+    [Migration("20240919164300_DescriptionRangeUpdatedFinal")]
+    partial class DescriptionRangeUpdatedFinal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,6 +82,9 @@ namespace Data.Migrations
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid>("JobStatusJob_status_id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("Job_status_id")
                         .HasColumnType("uniqueidentifier");
 
@@ -87,7 +93,7 @@ namespace Data.Migrations
 
                     b.HasKey("Category_id");
 
-                    b.HasIndex("Job_status_id");
+                    b.HasIndex("JobStatusJob_status_id");
 
                     b.HasIndex("User_id");
 
@@ -413,10 +419,10 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Data.Entities.Category", b =>
                 {
-                    b.HasOne("Data.Entities.JobStatus", "Job_status")
+                    b.HasOne("Data.Entities.JobStatus", "JobStatus")
                         .WithMany("Categories")
-                        .HasForeignKey("Job_status_id")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasForeignKey("JobStatusJob_status_id")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.User", "User")
@@ -425,7 +431,7 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Job_status");
+                    b.Navigation("JobStatus");
 
                     b.Navigation("User");
                 });
