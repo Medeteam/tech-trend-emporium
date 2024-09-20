@@ -30,6 +30,12 @@ namespace Data
                 .HasForeignKey(p => p.Job_status_id)
                 .OnDelete(DeleteBehavior.NoAction);  // Sin cascada
 
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.Job_status)
+                .WithMany(js => js.Categories)  // Un JobStatus puede tener muchas categorías
+                .HasForeignKey(c => c.Job_status_id)
+                .OnDelete(DeleteBehavior.NoAction);
+
             // Relación de clave compuesta para ProductToCart (sin cascada)
             modelBuilder.Entity<ProductToCart>()
                 .HasKey(ptc => new { ptc.Product_id, ptc.Cart_id });
@@ -108,7 +114,12 @@ namespace Data
                 .HasOne(u => u.Cart)
                 .WithOne(c => c.User)
                 .HasForeignKey<Cart>(c => c.User_id)
-                .OnDelete(DeleteBehavior.NoAction);  
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Configuración del campo Price en Product
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18,2)");
 
         }
     }

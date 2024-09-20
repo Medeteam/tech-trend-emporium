@@ -2,6 +2,7 @@
 using Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using App.Services;
 
 namespace app
 {
@@ -18,15 +19,22 @@ namespace app
 
             builder.Services.AddDbContext<DBContextTechEmporiumTrend>(
                 options=>options.UseSqlServer(connectionString)
-                
+
                 );
+
 
             // Add services to the container.
 
             builder.Services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<FakeStoreService>();
+            // Agregar servicios para FakeStoreService con HttpClient
+            builder.Services.AddHttpClient<FakeStoreService>();
+
 
             var app = builder.Build();
 
