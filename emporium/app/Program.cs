@@ -42,7 +42,7 @@ namespace app
                     {
                         OnMessageReceived = context =>
                         {
-                            var token = context.HttpContext.Request.Cookies["Autorization"]; // Leer el token desde la cookie
+                            var token = context.HttpContext.Request.Cookies["Authorization"]; // Leer el token desde la cookie
                             if (!string.IsNullOrEmpty(token))
                             {
                                 context.Token = token;

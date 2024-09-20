@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Data;
 using System.IdentityModel.Tokens.Jwt;
 using Data.DataForTest;
+using Microsoft.Identity.Client;
 
 namespace App.Controllers
 {
@@ -40,15 +41,14 @@ namespace App.Controllers
                 var token = GenerateJWTToken(user);
                 var cookieOptions = new CookieOptions
                 {
-                    HttpOnly = true, // La cookie no puede ser accedida desde JavaScript
-                    SameSite = SameSiteMode.Strict, // Protección contra CSRF
-                    Expires = DateTime.Now.AddMinutes(120) // Tiempo de vida de la cookie
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict, 
+                    Expires = DateTime.Now.AddMinutes(120) 
                 };
 
-                Response.Cookies.Append("Autorization", token, cookieOptions); // Añadir el token a la cookie
+                Response.Cookies.Append("Authorization", token, cookieOptions); // Añadir el token a la cookie
                 return Ok(token);
             }
-
             return NotFound("User not found");
         }
 
