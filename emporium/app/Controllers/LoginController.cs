@@ -61,7 +61,7 @@ namespace App.Controllers
                 new Claim(ClaimTypes.Sid , user.User_id.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, user.Username),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.RoleName)
+                new Claim(ClaimTypes.Role, user.RoleName)
             };
 
             var token = new JwtSecurityToken(
@@ -76,18 +76,30 @@ namespace App.Controllers
         private User? AuthenticateUser(UserLoginDto userLogin)
         {
             // Real search
-            //var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username 
-            //    && u.Password == userLogin.Password);
-            //return user is not null ? user : null;
+            var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username
+                && u.Password == userLogin.Password);
+            if (user != null) {
+                var role = GetRoleById(user.Role_id);
+                if (role != null)
+                {
+                    user.Role = role;
+                }
+            }
+            return user is not null ? user : null;
 
             // Test search
-            var currentUser = UserConstants.Users.FirstOrDefault(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password);
+            //var currentUser = UserConstants.Users.FirstOrDefault(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password);
 
-            if (currentUser != null)
-            {
-                return currentUser;
-            }
-            return null;
+            //if (currentUser != null)
+            //{
+            //    return currentUser;
+            //}
+            //return null;
+        }
+
+        private Role? GetRoleById(Guid roleId) {
+            var role = _context.Roles.FirstOrDefault(r => r.Role_id == roleId);
+            return role;
         }
     }
 }

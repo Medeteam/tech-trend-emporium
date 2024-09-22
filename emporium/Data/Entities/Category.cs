@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Data.Entities
 {
@@ -21,8 +22,9 @@ namespace Data.Entities
         public Guid User_id { get; set; }
         public User User { get; set; }
 
+        [ForeignKey("JobStatus")]
         public Guid Job_status_id { get; set; }
-        public JobStatus JobStatus { get; set; }
+        public JobStatus Job_status { get; set; }
 
         public ProductToCategory ProductToCategory { get; set; }
 

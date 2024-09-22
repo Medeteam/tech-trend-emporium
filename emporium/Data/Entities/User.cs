@@ -22,6 +22,7 @@ namespace Data.Entities
         [ForeignKey("Role")]
         public Guid Role_id { get; set; }
         public Role Role { get; set; }
+        public string RoleName => Role?.RoleName;
 
         public WishList WishList { get; set; }
         public Cart Cart { get; set; }

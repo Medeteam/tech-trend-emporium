@@ -5,6 +5,7 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using App.Services;
 
 namespace app
 {
@@ -24,12 +25,14 @@ namespace app
 
             builder.Services.AddDbContext<DBContextTechEmporiumTrend>(
                 options=>options.UseSqlServer(connectionString)
-                
+
                 );
+
 
             // Add services to the container.
 
             builder.Services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -66,6 +69,9 @@ namespace app
                 options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
                 options.AddPolicy("RequireEmployeeOrSuperiorRole", policy => policy.RequireRole("Admin", "Employee"));
             });
+            builder.Services.AddScoped<FakeStoreService>();
+            // Agregar servicios para FakeStoreService con HttpClient
+            builder.Services.AddHttpClient<FakeStoreService>();
 
             var app = builder.Build();
 

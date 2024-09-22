@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DBContextTechEmporiumTrend))]
-    [Migration("20240917224725_UpdateDeleteBehavior")]
-    partial class UpdateDeleteBehavior
+    [Migration("20240920041932_LastFunctionalMigration")]
+    partial class LastFunctionalMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,10 @@ namespace Data.Migrations
                     b.Property<Guid>("Coupon_id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Coupon_name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
@@ -42,6 +46,10 @@ namespace Data.Migrations
 
                     b.Property<Guid>("User_id")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Cart_id");
 
@@ -74,9 +82,6 @@ namespace Data.Migrations
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("JobStatusJob_status_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("Job_status_id")
                         .HasColumnType("uniqueidentifier");
 
@@ -85,7 +90,7 @@ namespace Data.Migrations
 
                     b.HasKey("Category_id");
 
-                    b.HasIndex("JobStatusJob_status_id");
+                    b.HasIndex("Job_status_id");
 
                     b.HasIndex("User_id");
 
@@ -187,13 +192,15 @@ namespace Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<string>("Image")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "image");
 
                     b.Property<Guid?>("JobStatusJob_status_id")
                         .HasColumnType("uniqueidentifier");
@@ -204,10 +211,12 @@ namespace Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "title");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)")
+                        .HasAnnotation("Relational:JsonPropertyName", "price");
 
                     b.Property<long>("Stock")
                         .HasColumnType("bigint");
@@ -215,7 +224,7 @@ namespace Data.Migrations
                     b.Property<Guid>("User_id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Wishlist_id")
+                    b.Property<Guid?>("Wishlist_id")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Product_id");
@@ -407,10 +416,10 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Data.Entities.Category", b =>
                 {
-                    b.HasOne("Data.Entities.JobStatus", "JobStatus")
+                    b.HasOne("Data.Entities.JobStatus", "Job_status")
                         .WithMany("Categories")
-                        .HasForeignKey("JobStatusJob_status_id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("Job_status_id")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.User", "User")
@@ -419,7 +428,7 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("JobStatus");
+                    b.Navigation("Job_status");
 
                     b.Navigation("User");
                 });
@@ -472,8 +481,7 @@ namespace Data.Migrations
                     b.HasOne("Data.Entities.WishList", "WishList")
                         .WithMany("Products")
                         .HasForeignKey("Wishlist_id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Job_status");
 

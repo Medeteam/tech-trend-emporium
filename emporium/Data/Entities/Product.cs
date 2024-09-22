@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Data.Entities
 {
@@ -9,15 +10,19 @@ namespace Data.Entities
         public Guid Product_id { get; set; } = Guid.NewGuid();
 
         [MaxLength(255)]
+        [JsonPropertyName("title")]
         public required string Name { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(2000)]
+        [JsonPropertyName("description")]
         public required string Description { get; set; }
 
         [MaxLength(255)]
+        [JsonPropertyName("image")]
         public required string Image { get; set; }
 
-        public uint Price { get; set; }
+        [JsonPropertyName("price")]
+        public decimal Price { get; set; }
 
         public uint Stock { get; set; }
 
@@ -32,8 +37,8 @@ namespace Data.Entities
         public JobStatus Job_status { get; set; }
 
         [ForeignKey("WishList")]
-        public Guid Wishlist_id { get; set; }
-        public WishList WishList { get; set; }
+        public Guid? Wishlist_id { get; set; }
+        public WishList? WishList { get; set; }
 
         public ProductToCategory ProductToCategory { get; set; }
 

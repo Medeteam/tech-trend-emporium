@@ -1,0 +1,82 @@
+﻿using Data.Entities;
+using Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using System.Linq;
+
+namespace App.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class UserController : ControllerBase
+    {
+        private readonly DBContextTechEmporiumTrend _context;
+        private readonly PasswordHasher<User> _passwordHasher;
+
+        public UserController(DBContextTechEmporiumTrend context)
+        {
+            _context = context;
+            _passwordHasher = new PasswordHasher<User>();
+        }
+
+        // Método para obtener todos los usuarios (ya implementado)
+        [HttpGet("GetUsers")]
+        public IActionResult GetAllUsers()
+        {
+            var users = _context.Users
+                .Select(u => new
+                {
+                    u.User_id,
+                    u.Username,
+                    u.Email,
+                    Role = u.Role.RoleName
+                })
+                .ToList();
+
+            return Ok(users);
+        }
+
+        // Obtener un solo usuario por ID
+        [HttpGet("GetUser/{id}")]
+        public IActionResult GetUserById(Guid id)
+        {
+            var user = _context.Users
+                .Where(u => u.User_id == id)
+                .Select(u => new
+                {
+                    u.User_id,
+                    u.Username,
+                    u.Email,
+                    Role = u.Role.RoleName
+                })
+                .FirstOrDefault();
+
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            return Ok(user);
+        }
+
+
+
+        // Método para eliminar un usuario por ID
+        [HttpDelete("DeleteUser/{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.User_id == id);
+
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("Usuario eliminado con éxito.");
+        }
+    }
+}
