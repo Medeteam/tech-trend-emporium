@@ -9,20 +9,18 @@ using DotNetEnv;
 using System.Security.Claims;
 using Data;
 using System.IdentityModel.Tokens.Jwt;
-using Data.DataForTest;
 using Microsoft.Identity.Client;
 
 namespace App.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class SessionController : ControllerBase
     {
         private readonly DBContextTechEmporiumTrend _context;
         private readonly string _jwtKey;
         private readonly string _jwtIssuer;
 
-        public LoginController(DBContextTechEmporiumTrend context)
+        public SessionController(DBContextTechEmporiumTrend context)
         {
             _context = context;
             DotNetEnv.Env.Load();
@@ -30,8 +28,10 @@ namespace App.Controllers
             _jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
         }
 
+        #region Login
+
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("api/login")]
         public IActionResult Login([FromBody] UserLoginDto userLogin)
         {
             var user = AuthenticateUser(userLogin);
@@ -42,13 +42,14 @@ namespace App.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Strict, 
-                    Expires = DateTime.Now.AddMinutes(120) 
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.Now.AddMinutes(120)
                 };
 
                 Response.Cookies.Append("Authorization", token, cookieOptions); // Añadir el token a la cookie
-                return Ok(token);
+                return Ok(new { token });
             }
+
             return NotFound("User not found");
         }
 
@@ -75,31 +76,44 @@ namespace App.Controllers
 
         private User? AuthenticateUser(UserLoginDto userLogin)
         {
-            // Real search
             var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username
-                && u.Password == userLogin.Password);
-            if (user != null) {
+                && u.Password == userLogin.Password); // Recuerda que aquí debes almacenar contraseñas hasheadas en lugar de texto plano
+            if (user != null)
+            {
                 var role = GetRoleById(user.Role_id);
                 if (role != null)
                 {
                     user.Role = role;
                 }
             }
-            return user is not null ? user : null;
-
-            // Test search
-            //var currentUser = UserConstants.Users.FirstOrDefault(o => o.Username.ToLower() == userLogin.Username.ToLower() && o.Password == userLogin.Password);
-
-            //if (currentUser != null)
-            //{
-            //    return currentUser;
-            //}
-            //return null;
+            return user;
         }
 
-        private Role? GetRoleById(Guid roleId) {
+        private Role? GetRoleById(Guid roleId)
+        {
             var role = _context.Roles.FirstOrDefault(r => r.Role_id == roleId);
             return role;
         }
+
+        #endregion
+
+        #region Logout
+
+        [HttpPost("api/logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            if (Request.Cookies.ContainsKey("Authorization"))
+            {
+                Response.Cookies.Delete("Authorization");
+                return Ok(new { message = "Logged out successfully" });
+            }
+            else
+            {
+                return Ok(new { message = "User is not logged" });
+            }
+        }
+
+        #endregion
     }
 }
