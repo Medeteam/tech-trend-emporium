@@ -43,7 +43,8 @@ namespace App.Controllers
                 {
                     HttpOnly = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.Now.AddMinutes(120)
+                    Expires = DateTime.Now.AddMinutes(120), 
+                    Secure = true
                 };
 
                 Response.Cookies.Append("Authorization", token, cookieOptions); // Añadir el token a la cookie
