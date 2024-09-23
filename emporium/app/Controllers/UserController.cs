@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace App.Controllers
 {
@@ -22,6 +23,7 @@ namespace App.Controllers
 
         // Método para obtener todos los usuarios (ya implementado)
         [HttpGet("GetUsers")]
+        [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetAllUsers()
         {
             var users = _context.Users
@@ -39,6 +41,7 @@ namespace App.Controllers
 
         // Obtener un solo usuario por ID
         [HttpGet("GetUser/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetUserById(Guid id)
         {
             var user = _context.Users
@@ -64,6 +67,7 @@ namespace App.Controllers
 
         // Método para eliminar un usuario por ID
         [HttpDelete("DeleteUser/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             var user = _context.Users.FirstOrDefault(u => u.User_id == id);
