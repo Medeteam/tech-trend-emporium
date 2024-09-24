@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Win32.SafeHandles;
+using Microsoft.AspNetCore.Authorization;
 
 namespace App.Controllers
 {
@@ -19,6 +20,7 @@ namespace App.Controllers
         }
 
         [HttpPost("create-default-shopping-status")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> CreateDefaultShoppingStatus()
         {
             var defaultShoppingStatuses = new List<string> { "Created", "Accepted", "Declined" };
@@ -51,6 +53,7 @@ namespace App.Controllers
         }
 
         [HttpGet(Name = "GetShoppingStatuses")]
+        [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetShoppingStatuses()
         {
             // Obtener todos los estados desde la base de datos usando LINQ
@@ -65,6 +68,7 @@ namespace App.Controllers
         }
 
         [HttpGet("GetShoppingStatus/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetShoppingStatusById(Guid id)
         {
             var shoppingStatus = _context.ShoppingStatus.FirstOrDefault(ss => ss.Shopping_status_id == id);
@@ -78,6 +82,7 @@ namespace App.Controllers
         }
 
         [HttpDelete("DeleteShoppingStatus/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteShoppingStatus(Guid id)
         {
             var shoppingStatus = _context.ShoppingStatus.FirstOrDefault(ss => ss.Shopping_status_id == id);

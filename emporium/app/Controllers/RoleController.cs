@@ -3,6 +3,7 @@ using Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace App.Controllers
 {
@@ -18,6 +19,7 @@ namespace App.Controllers
         }
 
         [HttpPost("create-default-roles")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> CreateDefaultRoles()
         {
             var defaultRoles = new List<string> { "Admin", "Employee", "Shopper" };
@@ -50,6 +52,7 @@ namespace App.Controllers
         }
 
         [HttpGet("GetRole")]
+        [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetRoles()
         {
             // Obtener todos los roles desde la base de datos usando LINQ
@@ -64,6 +67,7 @@ namespace App.Controllers
         }
 
         [HttpGet("GetRole/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetRoleById(Guid id)
         {
             var role = _context.Roles.FirstOrDefault(r => r.Role_id == id);
@@ -77,6 +81,7 @@ namespace App.Controllers
         }
 
         [HttpDelete("DeleteRole/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteRole(Guid id)
         {
             var role = _context.Roles.FirstOrDefault(r => r.Role_id == id);

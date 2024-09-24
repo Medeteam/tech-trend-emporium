@@ -2,12 +2,16 @@
 using Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using App.Services;
 
 namespace app
 {
     public class Program
     {
+
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +19,8 @@ namespace app
             DotNetEnv.Env.Load();
 
             string connectionString = Environment.GetEnvironmentVariable("SQLSERVER_CONNECTION_STRING");
+            string jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            string jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
 
 
             builder.Services.AddDbContext<DBContextTechEmporiumTrend>(
@@ -31,10 +37,41 @@ namespace app
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Add authentication service
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var token = context.HttpContext.Request.Cookies["Authorization"]; // Leer el token desde la cookie
+                            if (!string.IsNullOrEmpty(token))
+                            {
+                                context.Token = token;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtIssuer,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                    };
+                });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("RequireEmployeeOrSuperiorRole", policy => policy.RequireRole("Admin", "Employee"));
+            });
             builder.Services.AddScoped<FakeStoreService>();
             // Agregar servicios para FakeStoreService con HttpClient
             builder.Services.AddHttpClient<FakeStoreService>();
-
 
             var app = builder.Build();
 
@@ -47,8 +84,9 @@ namespace app
 
             app.UseHttpsRedirection();
 
+            // Use authentication and autorization services
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

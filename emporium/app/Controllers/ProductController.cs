@@ -4,6 +4,7 @@ using Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace App.Controllers
 {
@@ -21,6 +22,7 @@ namespace App.Controllers
         }
 
         [HttpPost("sync-products")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> SyncProducts()
         {
             // Obtener los productos desde la Fake Store API
@@ -70,6 +72,7 @@ namespace App.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("Get-Products")]
         public IActionResult GetProducts()
         {
@@ -92,6 +95,7 @@ namespace App.Controllers
             return Ok(productDtos);
         }
 
+        [AllowAnonymous]
         [HttpGet("GetProduct/{id}")]
         public IActionResult GetProductById(Guid id)
         {
@@ -122,6 +126,7 @@ namespace App.Controllers
         }
 
         [HttpDelete("DeleteProduct/{id}")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             var product = _context.Products.FirstOrDefault(p => p.Product_id == id);
