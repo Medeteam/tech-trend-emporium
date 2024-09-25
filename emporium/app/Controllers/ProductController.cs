@@ -28,35 +28,47 @@ namespace App.Controllers
             // Obtener los productos desde la Fake Store API
             var productsFromApi = await _fakeStoreService.GetProductsAsync();
 
-            // Buscar al usuario específico "JhonatanT"
-            var User = _context.Users.FirstOrDefault(u => u.Username == "JhonatanT");
+            // Buscar al usuario específico "CamiloVelezP"
+            var user = _context.Users.FirstOrDefault(u => u.Username == "CamiloVelezP");
 
             // Obtener el estado de trabajo 'Accepted'
             var acceptedStatus = _context.Jobs.FirstOrDefault(js => js.Job_status == "Accepted");
 
             // Validar si se encontró el usuario y el estado
-            if (User == null || acceptedStatus == null)
+            if (user == null || acceptedStatus == null)
             {
-                return BadRequest("Es necesario tener el usuario 'JhonatanT' y un estado de trabajo 'Accepted' antes de sincronizar productos.");
+                return BadRequest("Es necesario tener el usuario 'CamiloVelezP' y un estado de trabajo 'Accepted' antes de sincronizar productos.");
             }
 
             // Filtrar los productos que aún no existen en la base de datos
             var existingProductNames = _context.Products.Select(p => p.Name).ToList();
 
-            var newProducts = productsFromApi
-                .Where(apiProduct => !existingProductNames.Contains(apiProduct.Name))
-                .Select(apiProduct => new Product
+            var newProducts = new List<Product>();
+
+            foreach (var apiProduct in productsFromApi.Where(p => !existingProductNames.Contains(p.Name)))
+            {
+                // Verificar si la categoría existe por el nombre
+                Console.WriteLine(apiProduct);
+                Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                var category = _context.Categories.FirstOrDefault(c => c.Category_name == apiProduct.CategoryName);
+                Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                Console.WriteLine(category);
+                // Crear el nuevo producto
+                var newProduct = new Product
                 {
-                    Name = apiProduct.Name, // Mapeo directo desde la API
-                    Description = apiProduct.Description, // Mapeo directo desde la API
-                    Image = apiProduct.Image, // Mapeo directo desde la API
-                    Price = apiProduct.Price, // Mapeo directo desde la API
+                    Name = apiProduct.Name,
+                    Description = apiProduct.Description,
+                    Category_id = category.Category_id, // Usar la Category_id existente o recién creada
+                    Image = apiProduct.Image,
+                    Price = apiProduct.Price,
                     Stock = 5, // Asignar un stock predeterminado
-                    User_id = User.User_id, // Asignar siempre el User_id de "JhonatanT"
+                    User_id = user.User_id, // Asignar siempre el User_id de "CamiloVelezP"
                     Job_status_id = acceptedStatus.Job_status_id, // Siempre asignar el estatus 'Accepted'
                     Wishlist_id = null // Mantener la wishlist vacía
-                })
-                .ToList();
+                };
+
+                newProducts.Add(newProduct);
+            }
 
             // Agregar todos los productos nuevos a la base de datos
             if (newProducts.Any())
@@ -84,6 +96,7 @@ namespace App.Controllers
                 product_id = p.Product_id,
                 title = p.Name,
                 description = p.Description,
+                category = p.Category,
                 image = p.Image,
                 price = p.Price,
                 stock = p.Stock,
@@ -108,6 +121,7 @@ namespace App.Controllers
                     product_id = p.Product_id,
                     title = p.Name,
                     description = p.Description,
+                    category = p.Category,
                     image = p.Image,
                     price = p.Price,
                     stock = p.Stock,
