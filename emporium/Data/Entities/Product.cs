@@ -47,7 +47,8 @@ namespace Data.Entities
         public Category Category { get; set; }
 
         [JsonPropertyName("category")]
-        public string CategoryName => Category?.Category_name;
+        [NotMapped]
+        public string CategoryName {  get; set; }
 
         public List<ProductToCart> ProductToCarts { get; set; }
 

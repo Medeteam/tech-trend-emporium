@@ -40,6 +40,9 @@ namespace App.Controllers
                 return BadRequest("Es necesario tener el usuario 'CamiloVelezP' y un estado de trabajo 'Accepted' antes de sincronizar productos.");
             }
 
+            //Obtener las categorias de la base de datos
+            var categories = GetCategories();
+
             // Filtrar los productos que aún no existen en la base de datos
             var existingProductNames = _context.Products.Select(p => p.Name).ToList();
 
@@ -47,18 +50,15 @@ namespace App.Controllers
 
             foreach (var apiProduct in productsFromApi.Where(p => !existingProductNames.Contains(p.Name)))
             {
-                // Verificar si la categoría existe por el nombre
-                Console.WriteLine(apiProduct);
-                Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                var category = _context.Categories.FirstOrDefault(c => c.Category_name == apiProduct.CategoryName);
-                Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                Console.WriteLine(category);
+                
+                var category = categories.FirstOrDefault(c => c.Category_name == apiProduct.CategoryName);
                 // Crear el nuevo producto
                 var newProduct = new Product
                 {
                     Name = apiProduct.Name,
                     Description = apiProduct.Description,
-                    Category_id = category.Category_id, // Usar la Category_id existente o recién creada
+                    Category = category,
+                    //Category_id = category.Category_id, // Usar la Category_id existente o recién creada
                     Image = apiProduct.Image,
                     Price = apiProduct.Price,
                     Stock = 5, // Asignar un stock predeterminado
@@ -82,6 +82,12 @@ namespace App.Controllers
             {
                 return Ok("No hay productos nuevos para sincronizar.");
             }
+        }
+
+        private List<Category> GetCategories()
+        {
+            var categories = _context.Categories.ToList<Category>();
+            return categories;
         }
 
         [AllowAnonymous]
