@@ -131,5 +131,17 @@ namespace App.Controllers
 
             return Ok("Categoría eliminada con éxito.");
         }
+        [HttpGet("GetPeoductsByCategory/{category}")]
+        public async Task<IActionResult> GetProductByCategory(string category)
+        {
+            var products = await _context.Products.Where(
+                p => p.Category.Category_name == category).ToListAsync();
+            if (!products.Any())
+            {
+                return NotFound(new { message = "No products found in this category." });
+            }
+
+            return Ok(products);
+        }
     }
 }

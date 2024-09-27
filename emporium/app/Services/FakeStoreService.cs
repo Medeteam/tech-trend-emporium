@@ -22,9 +22,8 @@ namespace App.Services
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            // Asegúrate de que el deserializador utilice el modelo correcto con los atributos JsonPropertyName
             var allProducts = JsonSerializer.Deserialize<List<Product>>(jsonResponse);
-
+            
             return allProducts;
         }
 

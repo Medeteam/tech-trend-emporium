@@ -40,7 +40,15 @@ namespace Data.Entities
         public Guid? Wishlist_id { get; set; }
         public WishList? WishList { get; set; }
 
-        public ProductToCategory ProductToCategory { get; set; }
+        [ForeignKey("Category")]
+        
+        public Guid Category_id { get; set; }
+
+        public Category Category { get; set; }
+
+        [JsonPropertyName("category")]
+        [NotMapped]
+        public string CategoryName {  get; set; }
 
         public List<ProductToCart> ProductToCarts { get; set; }
 

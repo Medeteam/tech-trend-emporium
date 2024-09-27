@@ -13,7 +13,7 @@ namespace Data.Entities
         [MaxLength(255)]
         public required string  Category_name { get; set; }
 
-        [MaxLength(255)]
+        [MaxLength(2000)]
         public required string Category_description { get; set; }
 
         public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
@@ -26,7 +26,7 @@ namespace Data.Entities
         public Guid Job_status_id { get; set; }
         public JobStatus Job_status { get; set; }
 
-        public ProductToCategory ProductToCategory { get; set; }
+        public List<Product> Products { get; set; }
 
     }
 }

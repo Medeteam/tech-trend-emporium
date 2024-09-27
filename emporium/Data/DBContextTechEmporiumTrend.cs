@@ -13,7 +13,6 @@ namespace Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<JobStatus> Jobs { get; set; }
-        public DbSet<ProductToCategory> ProductToCategories { get; set; }
         public DbSet<WishList> WishList { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<ProductToCart> ProductsToCart {  get; set; }
@@ -36,6 +35,13 @@ namespace Data
                 .HasForeignKey(c => c.Job_status_id)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.Category_id)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
             // Relación de clave compuesta para ProductToCart (sin cascada)
             modelBuilder.Entity<ProductToCart>()
                 .HasKey(ptc => new { ptc.Product_id, ptc.Cart_id });
@@ -51,10 +57,6 @@ namespace Data
                 .WithMany(c => c.ProductToCarts)
                 .HasForeignKey(ptc => ptc.Cart_id)
                 .OnDelete(DeleteBehavior.Cascade);  // Mantener cascada
-
-            // Relación de clave compuesta para ProductToCategory
-            modelBuilder.Entity<ProductToCategory>()
-                .HasKey(ptcy => new { ptcy.Product_id, ptcy.Category_id });
 
             // Relación de clave compuesta para ProductWishList
             modelBuilder.Entity<ProductWishList>()
