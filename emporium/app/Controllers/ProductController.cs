@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Data.DTOs;
 
 namespace App.Controllers
 {
@@ -91,49 +92,43 @@ namespace App.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("Get-Products")]
+        [HttpGet("/store/products")]
         public IActionResult GetProducts()
         {
             var products = _context.Products;
 
+            // TODO actualizar para agregar el rating
             // Retornar la lista de productos con los detalles de usuario y estado de trabajo
-            var productDtos = products.Select(p => new
+            var productDtos = products.Select(p => new ProductDto
             {
-                product_id = p.Product_id,
+                id = p.Product_id,
                 title = p.Name,
                 description = p.Description,
                 category = p.Category.Category_name,
                 image = p.Image,
                 price = p.Price,
                 stock = p.Stock,
-                created_at = p.Created_at,
-                username = p.User.Username,
-                job_status = p.Job_status.Job_status,
             }).ToList();
 
             return Ok(productDtos);
         }
 
         [AllowAnonymous]
-        [HttpGet("GetProduct/{id}")]
+        [HttpGet("/store/product/{id}")]
         public IActionResult GetProductById(Guid id)
         {
+            // TODO actualizar para agregar el rating
             var product = _context.Products
-                .Include(p => p.User)
-                .Include(p => p.Job_status)
                 .Where(p => p.Product_id == id)
-                .Select(p => new
+                .Select(p => new ProductDto
                 {
-                    product_id = p.Product_id,
+                    id = p.Product_id,
                     title = p.Name,
                     description = p.Description,
                     category = p.Category.Category_name,
                     image = p.Image,
                     price = p.Price,
                     stock = p.Stock,
-                    created_at = p.Created_at,
-                    username = p.User.Username,
-                    job_status = p.Job_status.Job_status
                 })
                 .FirstOrDefault();
 
