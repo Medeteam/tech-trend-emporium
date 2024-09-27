@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Data;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Identity.Client;
+using Microsoft.AspNetCore.Identity;
 
 namespace App.Controllers
 {
@@ -77,17 +78,30 @@ namespace App.Controllers
 
         private User? AuthenticateUser(UserLoginDto userLogin)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username
-                && u.Password == userLogin.Password); // Recuerda que aquí debes almacenar contraseñas hasheadas en lugar de texto plano
+            // Buscar al usuario por su nombre de usuario en la base de datos
+            var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username);
+
             if (user != null)
             {
-                var role = GetRoleById(user.Role_id);
-                if (role != null)
+                // Usar PasswordHasher para verificar la contraseña en texto plano contra la hasheada
+                var passwordHasher = new PasswordHasher<User>();
+                var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.Password, userLogin.Password);
+
+                // Si la verificación es exitosa, devolver el usuario
+                if (passwordVerificationResult == PasswordVerificationResult.Success)
                 {
-                    user.Role = role;
+                    // Cargar el rol del usuario
+                    var role = GetRoleById(user.Role_id);
+                    if (role != null)
+                    {
+                        user.Role = role;
+                    }
+                    return user;
                 }
             }
-            return user;
+
+            // Si no se encuentra o la contraseña no coincide, devolver null
+            return null;
         }
 
         private Role? GetRoleById(Guid roleId)
