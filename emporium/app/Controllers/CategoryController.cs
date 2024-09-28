@@ -11,60 +11,11 @@ namespace App.Controllers
     [Route("[controller]")]
     public class CategoryController : ControllerBase
     {
-        private readonly FakeStoreService _fakeStoreService;
         private readonly DBContextTechEmporiumTrend _context;
 
-        public CategoryController(FakeStoreService fakeStoreService, DBContextTechEmporiumTrend context)
+        public CategoryController(DBContextTechEmporiumTrend context)
         {
-            _fakeStoreService = fakeStoreService;
             _context = context;
-        }
-
-        [HttpPost("sync-categories")]
-        public async Task<IActionResult> SyncCategories()
-        {
-            // Obtener las categorías desde la API de FakeStore
-            var categoriesFromApi = await _fakeStoreService.GetCategoriesAsync();
-
-            // Buscar al usuario específico "CamiloVelezP"
-            var User = _context.Users.FirstOrDefault(u => u.Username == "CamiloVelezP");
-
-            // Obtener el estado de trabajo 'Accepted'
-            var acceptedStatus = _context.Jobs.FirstOrDefault(js => js.Job_status == "Accepted");
-
-            // Validar si se encontró el usuario y el estado
-            if (User == null || acceptedStatus == null)
-            {
-                return BadRequest("Es necesario tener el usuario 'CamiloVelezP' y un estado de trabajo 'Accepted' antes de sincronizar categorías.");
-            }
-
-            // Obtener las categorías ya existentes en la base de datos
-            var existingCategories = _context.Categories.Select(c => c.Category_name).ToList();
-
-            // Filtrar las categorías que aún no existen en la base de datos
-            var newCategories = categoriesFromApi
-                .Where(apiCategory => !existingCategories.Contains(apiCategory))
-                .Select(apiCategory => new Category
-                {
-                    Category_name = apiCategory,
-                    Category_description = $"Categoría agregada desde API, sin descripción adicional.",
-                    User_id = User.User_id, // Asignar siempre el User_id de "CamiloVelezP"
-                    Job_status_id = acceptedStatus.Job_status_id // Asignar el estado 'Accepted'
-                })
-                .ToList();
-
-            // Si hay categorías nuevas, agregarlas a la base de datos
-            if (newCategories.Any())
-            {
-                _context.Categories.AddRange(newCategories);
-                await _context.SaveChangesAsync();
-
-                return Ok($"{newCategories.Count} categorías sincronizadas con éxito.");
-            }
-            else
-            {
-                return Ok("No hay categorías nuevas para sincronizar.");
-            }
         }
 
         [HttpGet("get-categories")]

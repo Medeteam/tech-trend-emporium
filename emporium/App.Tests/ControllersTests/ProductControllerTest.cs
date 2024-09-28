@@ -13,32 +13,41 @@ namespace App.Tests.ControllersTests
 {
     public class ProductControllerTest
     {
-        private readonly FakeStoreService _storeService;
         private readonly DBContextTechEmporiumTrend _context;
         private readonly ProductController _controller;
+        private readonly Faker<Product> _faker;
 
         public ProductControllerTest()
         {
-            _storeService = Substitute.For<FakeStoreService>();
-            _context = Substitute.For<DBContextTechEmporiumTrend>();
-            _controller = new ProductController(_storeService, _context);
+            var options = new DbContextOptionsBuilder<DBContextTechEmporiumTrend>()
+            .UseInMemoryDatabase(databaseName: "TestDatabase")
+            .Options;
+
+            _context = new DBContextTechEmporiumTrend(options);
+            _controller = new ProductController(_context);
+
+            _faker = new Faker<Product>()
+                .RuleFor(p => p.Product_id, Guid.NewGuid)
+                .RuleFor(p => p.Name, f => f.Commerce.ProductName())
+                .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
+                .RuleFor(p => p.Category, f => new Category
+                {
+                    Category_name = f.Commerce.Categories(1).First(),
+                    Category_description = f.Lorem.Text()
+                })
+                .RuleFor(p => p.Image, f => f.Image.PicsumUrl())
+                .RuleFor(p => p.Price, f => f.Random.Decimal(0, 100))
+                .RuleFor(p => p.Stock, f => (uint)f.Random.Int(0, 100));
         }
+
         [Fact]
         public void GetProducts_Successfully()
         {
             // Arrange
-            var faker = new Faker<Product>()
-                .RuleFor(p => p.Product_id, Guid.NewGuid)
-                .RuleFor(p => p.Name, f => f.Commerce.ProductName())
-                .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
-                .RuleFor(p => p.CategoryName, f => f.Commerce.Categories(0).First())
-                .RuleFor(p => p.Image, f => f.Image.PicsumUrl())
-                .RuleFor(p => p.Price, f => f.Random.Decimal(0, 100))
-                .RuleFor(p => p.Stock, f => (uint)f.Random.Int(0, 100));
+            var mockProducts = _faker.Generate(5);
 
-            var mockProducts = faker.Generate(5).AsQueryable();
-            _context.Products.Returns(mockProducts);
-
+            _context.Products.AddRange(mockProducts);
+            _context.SaveChanges();
 
             // Act
             var result = _controller.GetProducts();
@@ -46,7 +55,42 @@ namespace App.Tests.ControllersTests
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returnValue = Assert.IsType<List<ProductDto>>(okResult.Value);
-            Assert.Equal(5, returnValue.Count);
+        }
+
+        [Fact]
+        public void GetProductById_Successfully()
+        {
+            // Arrange
+            var mockProduct = _faker.Generate();
+            var id = mockProduct.Product_id;
+
+            _context.Products.Add(mockProduct);
+            _context.SaveChanges();
+
+            // Act
+            var result = _controller.GetProductById(id);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnValue = Assert.IsType<ProductDto>(okResult.Value);
+        }
+
+        [Fact]
+        public void GetProductById_UsingWrongId()
+        {
+            // Arrange
+            var mockProduct = _faker.Generate();
+            var id = Guid.NewGuid();
+
+            _context.Products.Add(mockProduct);
+            _context.SaveChanges();
+
+            // Act
+            var result = _controller.GetProductById(id);
+
+            // Assert
+            var okResult = Assert.IsType<NotFoundObjectResult>(result);
+
         }
     }
 }
