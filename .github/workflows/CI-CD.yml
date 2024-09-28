@@ -35,6 +35,8 @@ jobs:
         run: dotnet build ./emporium/emporium.sln --configuration Release --no-restore
       - name: Test
         run: dotnet test ./emporium/emporium.sln --configuration Release --no-build --no-restore --collect:"XPlat Code Coverage"
+      - name: List coverage files
+        run: ls -R **/coverage.opencover.xml
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
