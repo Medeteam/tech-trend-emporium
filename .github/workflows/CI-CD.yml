@@ -34,9 +34,9 @@ jobs:
       - name: Build
         run: dotnet build ./emporium/emporium.sln --configuration Release --no-restore
       - name: Test
-        run: dotnet test ./emporium/emporium.sln --configuration Release --no-build --no-restore --collect:"XPlat Code Coverage"
+        run: dotnet test ./emporium/emporium.sln --configuration Release --no-build --no-restore --collect:"XPlat Code Coverage" --results-directory ./TestResults
       - name: List coverage files
-        run: ls -R **/coverage.opencover.xml
+        run: ls -R ./TestResults
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
@@ -60,7 +60,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          .sonar/scanner/dotnet-sonarscanner begin /k:"Medeteam_tech-trend-emporium" /o:"medeteam-1" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"  /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+          .sonar/scanner/dotnet-sonarscanner begin /k:"Medeteam_tech-trend-emporium" /o:"medeteam-1" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"  /d:sonar.cs.opencover.reportsPaths="./TestResults/**/coverage.cobertura.xml"
           dotnet build ./emporium/emporium.sln
           .sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
   
