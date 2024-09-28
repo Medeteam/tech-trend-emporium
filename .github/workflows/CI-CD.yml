@@ -33,12 +33,12 @@ jobs:
         run: dotnet restore ./emporium/emporium.sln
       - name: Build
         run: dotnet build ./emporium/emporium.sln --configuration Release --no-restore
-      - name: Install coverlet
-        run: dotnet tool install --global coverlet.console
-      - name: Test
-        run: dotnet test ./emporium/emporium.sln --configuration Release --no-build --no-restore --collect:"XPlat Code Coverage" --results-directory ./TestResults /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/coverage.cobertura.xml
-      - name: List coverage files
-        run: ls -R ./TestResults
+      # - name: Install coverlet
+      #   run: dotnet tool install --global coverlet.console
+      # - name: Test
+      #   run: dotnet test ./emporium/emporium.sln --configuration Release --no-build --no-restore --collect:"XPlat Code Coverage" --results-directory ./TestResults /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/coverage.cobertura.xml
+      # - name: List coverage files
+      #   run: ls -R ./TestResults
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
@@ -57,14 +57,19 @@ jobs:
         run: |
           mkdir -p .sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path .sonar/scanner
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # - name: Build and analyze
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   run: |
+      #     .sonar/scanner/dotnet-sonarscanner begin /k:"Medeteam_tech-trend-emporium" /o:"medeteam-1" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"  /d:sonar.cs.opencover.reportsPaths="./TestResults/**/coverage.cobertura.xml"
+      #     dotnet build ./emporium/emporium.sln
+      #     .sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - name: Run tests and SonarCloud analysis
         run: |
-          .sonar/scanner/dotnet-sonarscanner begin /k:"Medeteam_tech-trend-emporium" /o:"medeteam-1" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"  /d:sonar.cs.opencover.reportsPaths="./TestResults/**/coverage.cobertura.xml"
-          dotnet build ./emporium/emporium.sln
-          .sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+            dotnet sonarscanner begin /k:"Medeteam_tech-trend-emporium" /o:"medeteam-1" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+            dotnet test ./emporium/emporium.sln --collect:"XPlat Code Coverage"
+            dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
   
   build_push:
     name: Build & Push
