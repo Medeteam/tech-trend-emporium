@@ -24,7 +24,7 @@ namespace App.Tests.ControllersTests
             _controller = new ProductController(_context);
 
             _faker = new Faker<Product>()
-                .RuleFor(p => p.Product_id, Guid.NewGuid)
+                .RuleFor(p => p.Product_id, p => Guid.NewGuid())
                 .RuleFor(p => p.Name, f => f.Commerce.ProductName())
                 .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
                 .RuleFor(p => p.Category, f => new Category
@@ -35,6 +35,12 @@ namespace App.Tests.ControllersTests
                 .RuleFor(p => p.Image, f => f.Image.PicsumUrl())
                 .RuleFor(p => p.Price, f => f.Random.Decimal(0, 100))
                 .RuleFor(p => p.Stock, f => (uint)f.Random.Int(0, 100));
+        }
+
+        private void ClearContext()
+        {
+            _context.Products.RemoveRange(_context.Products);
+            _context.SaveChanges();
         }
 
         [Fact]
@@ -87,6 +93,49 @@ namespace App.Tests.ControllersTests
 
             // Assert
             var okResult = Assert.IsType<NotFoundObjectResult>(result);
+
+        }
+
+        [Fact]
+        public async Task DeleteProduct_Successfully()
+        {
+            // Arrange
+            ClearContext();
+            var mockProduct = _faker.Generate();
+            var id = mockProduct.Product_id;
+
+            _context.Products.Add(mockProduct);
+            _context.SaveChanges();
+
+            // Act
+            var result = await _controller.DeleteProduct(id);
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            
+            var productsCount = _context.Products.Count();
+            Assert.True(productsCount == 0);
+        }
+
+        [Fact]
+        public async Task DeleteProduct_UsingWrongId()
+        {
+            // Arrange
+            ClearContext();
+            var mockProduct = _faker.Generate();
+            var id = Guid.NewGuid();
+
+            _context.Products.Add(mockProduct);
+            _context.SaveChanges();
+
+            // Act
+            var result = await _controller.DeleteProduct(id);
+
+            // Assert
+            Assert.IsType<NotFoundObjectResult>(result);
+
+            var productsCount = _context.Products.Count();
+            Assert.True(productsCount > 0);
 
         }
     }
