@@ -4,6 +4,7 @@ using Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Data.DTOs;
 
 namespace App.Controllers
 {
@@ -18,20 +19,15 @@ namespace App.Controllers
             _context = context;
         }
 
-        [HttpGet("get-categories")]
+        [HttpGet("category")]
         public IActionResult GetCategories()
         {
             var categories = _context.Categories
-                .Include(c => c.User)
-                .Include(c => c.Job_status)
-                .Select(c => new
+                .Select(c => new CategoryDto
                 {
-                    c.Category_id,
-                    c.Category_name,
-                    c.Category_description,
-                    c.Created_at,
-                    UserName = c.User.Username,
-                    JobStatus = c.Job_status.Job_status
+                    id = c.Category_id,
+                    name = c.Category_name,
+                    description = c.Category_description
                 })
                 .ToList();
 
@@ -43,19 +39,16 @@ namespace App.Controllers
             return Ok(categories);
         }
 
-        [HttpGet("GetCategory/{id}")]
+        [HttpGet("category/{id}")]
         public IActionResult GetCategoryById(Guid id)
         {
             var category = _context.Categories
                 .Where(c => c.Category_id == id)
-                .Select(c => new
+                .Select(c => new CategoryDto
                 {
-                    c.Category_id,
-                    c.Category_name,
-                    c.Category_description,
-                    c.Created_at,
-                    UserName = c.User.Username,
-                    JobStatus = c.Job_status.Job_status
+                    id = c.Category_id,
+                    name = c.Category_name,
+                    description = c.Category_description
                 })
                 .FirstOrDefault();
 
@@ -67,7 +60,7 @@ namespace App.Controllers
             return Ok(category);
         }
 
-        [HttpDelete("DeleteCategory/{id}")]
+        [HttpDelete("category/{id}")]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);
@@ -82,6 +75,7 @@ namespace App.Controllers
 
             return Ok("Categoría eliminada con éxito.");
         }
+
         [HttpGet("GetPeoductsByCategory/{category}")]
         public async Task<IActionResult> GetProductByCategory(string category)
         {
