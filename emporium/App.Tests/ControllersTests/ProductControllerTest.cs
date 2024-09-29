@@ -1,13 +1,10 @@
 ﻿using App.Controllers;
-using App.Services;
 using Bogus;
 using Data;
 using Data.DTOs;
 using Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NSubstitute;
-using Polly;
 
 namespace App.Tests.ControllersTests
 {
