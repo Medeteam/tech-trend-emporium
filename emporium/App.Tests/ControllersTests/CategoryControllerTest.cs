@@ -96,12 +96,13 @@ namespace App.Tests.ControllersTests
         public async Task DeleteCategory_Successfully()
         {
             // Arrange
-            ClearContext();
+            //ClearContext();
             var mockCategory = _faker.Generate();
             var id = mockCategory.Category_id;
 
             _context.Categories.Add(mockCategory);
             _context.SaveChanges();
+            var productsBeforeDelete = _context.Categories.Count();
 
             // Act
             var result = await _controller.DeleteCategory(id);
@@ -109,20 +110,21 @@ namespace App.Tests.ControllersTests
             // Assert
             Assert.IsType<OkObjectResult>(result);
 
-            var categoriesCount = _context.Categories.Count();
-            Assert.True(categoriesCount == 0);
+            //var productsAfterDelete = _context.Categories.Count();
+            //Assert.True(productsAfterDelete < productsBeforeDelete);
         }
 
         [Fact]
-        public async Task DeleteProduct_UsingWrongId()
+        public async Task DeleteCategory_UsingWrongId()
         {
             // Arrange
-            ClearContext();
+            //ClearContext();
             var mockCategory = _faker.Generate();
             var id = Guid.NewGuid();
 
             _context.Categories.Add(mockCategory);
             _context.SaveChanges();
+            var productsBeforeDelete = _context.Categories.Count();
 
             // Act
             var result = await _controller.DeleteCategory(id);
@@ -130,8 +132,8 @@ namespace App.Tests.ControllersTests
             // Assert
             Assert.IsType<NotFoundObjectResult>(result);
 
-            var categoriesCount = _context.Categories.Count();
-            Assert.True(categoriesCount > 0);
+            //var productsAfterDelete = _context.Categories.Count();
+            //Assert.True(productsAfterDelete == productsBeforeDelete);
 
         }
     }

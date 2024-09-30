@@ -22,9 +22,21 @@ namespace App.Controllers
 
         [AllowAnonymous]
         [HttpGet("/store/products")]
-        public IActionResult GetProducts()
+        public IActionResult GetProducts([FromQuery] string category = "")
         {
-            var products = _context.Products;
+            var products = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                if (_context.Categories.Where(c => c.Category_name == category).Any())
+                {
+                    products = products.Where(p => p.Category.Category_name == category);
+                }
+                else
+                {
+                    return NotFound(new { message = "The category doesn't exists" });
+                }
+            }
 
             // TODO actualizar para agregar el rating
             // Retornar la lista de productos con los detalles de usuario y estado de trabajo
@@ -43,7 +55,7 @@ namespace App.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("/store/product/{id}")]
+        [HttpGet("/store/products/{id}")]
         public IActionResult GetProductById(Guid id)
         {
             // TODO actualizar para agregar el rating
@@ -63,27 +75,27 @@ namespace App.Controllers
 
             if (product == null)
             {
-                return NotFound("Producto no encontrado.");
+                return NotFound(new { message = "Product not found" });
             }
 
             return Ok(product);
-        }
+        }        
 
-        [HttpDelete("DeleteProduct/{id}")]
+        [HttpDelete("/products")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        public async Task<IActionResult> DeleteProduct([FromBody]Guid id)
         {
             var product = _context.Products.FirstOrDefault(p => p.Product_id == id);
 
             if (product == null)
             {
-                return NotFound("Producto no encontrado.");
+                return NotFound(new { message = "Product not found" });
             }
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return Ok("Producto eliminado con éxito.");
+            return Ok(new { message = "Product deleted successfuly" });
         }
     }
 }

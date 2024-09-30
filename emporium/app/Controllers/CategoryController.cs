@@ -19,7 +19,7 @@ namespace App.Controllers
             _context = context;
         }
 
-        [HttpGet("category")]
+        [HttpGet("/category")]
         public IActionResult GetCategories()
         {
             var categories = _context.Categories
@@ -33,13 +33,13 @@ namespace App.Controllers
 
             if (!categories.Any())
             {
-                return NotFound("No se encontraron categorías en la base de datos.");
+                return NotFound(new { message = "Categories not found" });
             }
 
             return Ok(categories);
         }
 
-        [HttpGet("category/{id}")]
+        [HttpGet("/category/{id}")]
         public IActionResult GetCategoryById(Guid id)
         {
             var category = _context.Categories
@@ -54,39 +54,26 @@ namespace App.Controllers
 
             if (category == null)
             {
-                return NotFound("Categoría no encontrada.");
+                return NotFound(new { message = "Category not found" });
             }
 
             return Ok(category);
         }
 
-        [HttpDelete("category/{id}")]
-        public async Task<IActionResult> DeleteCategory(Guid id)
+        [HttpDelete("/category")]
+        public async Task<IActionResult> DeleteCategory([FromBody] Guid id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);
 
             if (category == null)
             {
-                return NotFound("Categoría no encontrada.");
+                return NotFound(new { message = "Category not found" });
             }
 
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            return Ok("Categoría eliminada con éxito.");
-        }
-
-        [HttpGet("GetPeoductsByCategory/{category}")]
-        public async Task<IActionResult> GetProductByCategory(string category)
-        {
-            var products = await _context.Products.Where(
-                p => p.Category.Category_name == category).ToListAsync();
-            if (!products.Any())
-            {
-                return NotFound(new { message = "No products found in this category." });
-            }
-
-            return Ok(products);
+            return Ok(new { message = "Category deleted successfully" });
         }
     }
 }

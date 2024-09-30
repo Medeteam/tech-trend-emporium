@@ -13,6 +13,7 @@ namespace App.Tests.ControllersTests
         private readonly DBContextTechEmporiumTrend _context;
         private readonly ProductController _controller;
         private readonly Faker<Product> _faker;
+        private readonly HttpClient _httpClient;
 
         public ProductControllerTest()
         {
@@ -35,11 +36,14 @@ namespace App.Tests.ControllersTests
                 .RuleFor(p => p.Image, f => f.Image.PicsumUrl())
                 .RuleFor(p => p.Price, f => f.Random.Decimal(0, 100))
                 .RuleFor(p => p.Stock, f => (uint)f.Random.Int(0, 100));
+
+            _httpClient = new HttpClient();
         }
 
         private void ClearContext()
         {
             _context.Products.RemoveRange(_context.Products);
+            _context.Categories.RemoveRange(_context.Categories);
             _context.SaveChanges();
         }
 
@@ -58,6 +62,52 @@ namespace App.Tests.ControllersTests
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returnValue = Assert.IsType<List<ProductDto>>(okResult.Value);
+        }
+
+        [Fact]
+        public void GetProductsOfCategory_Successfully()
+        {
+            // Arrange
+            ClearContext();
+            var mockProduct = _faker.Generate();
+            var faker = new Faker();
+            var mockCategory = new Category
+            {
+                Category_id = Guid.NewGuid(),
+                Category_description = faker.Lorem.Text(),
+                Category_name = faker.Commerce.Categories(1).First()
+            };
+            var mockCategoryName = mockCategory.Category_name;
+
+            _context.Products.Add(mockProduct);
+            _context.Categories.Add(mockCategory);
+            _context.SaveChanges();
+
+            // Act
+            var result = _controller.GetProducts(mockCategoryName);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.IsType<List<ProductDto>>(okResult.Value);
+        }
+
+        [Fact]
+        public void GetProductsOfCategory_WithNotExistingCategory()
+        {
+            // Arrange
+            ClearContext();
+            var mockProduct = _faker.Generate();
+            var faker = new Faker();
+            var mockCategory = faker.Commerce.Categories(1).First();
+
+            _context.Products.Add(mockProduct);
+            _context.SaveChanges();
+
+            // Act
+            var result = _controller.GetProducts(mockCategory);
+
+            // Assert
+            Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
