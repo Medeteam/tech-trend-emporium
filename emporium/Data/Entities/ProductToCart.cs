@@ -5,8 +5,6 @@ namespace Data.Entities
 {
     public class ProductToCart
     {
-        [Key]
-        public Guid Product_cart_id { get; set; } = Guid.NewGuid();
 
         public int? Quantity { get; set; }
 

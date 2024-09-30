@@ -16,14 +16,8 @@ namespace Data.Entities
         [MaxLength(2000)]
         public string? Review_content { get; set; }
 
-        [ForeignKey("User")]
-        public Guid? User_id { get; set; }
-        public User? User { get; set; }
-
         [ForeignKey("Product")]
         public Guid? Product_id { get; set; }
         public Product? Product { get; set; }   
-
-
     }
 }

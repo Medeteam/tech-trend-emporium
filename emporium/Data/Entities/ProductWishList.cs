@@ -5,9 +5,6 @@ namespace Data.Entities
 {
     public class ProductWishList
     {
-        [Key]
-        public Guid ProductWishList_id { get; set; } = Guid.NewGuid();
-
         [ForeignKey("Product")]
         public Guid Product_id { get; set; }
         public Product? Product { get; set; }

@@ -26,11 +26,7 @@ namespace Data.Entities
 
         public WishList? WishList { get; set; }
         public Cart? Cart { get; set; }
-
-        public List<Product>? Products { get; set; }
         public List<Review>? Reviews { get; set; }
-        public List<Category>? Categories { get; set; }
-        public List<Order>? Orders { get; set; } = new List<Order>();
 
     }
 }

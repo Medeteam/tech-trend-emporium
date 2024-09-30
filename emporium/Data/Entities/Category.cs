@@ -16,17 +16,7 @@ namespace Data.Entities
         [MaxLength(2000)]
         public required string Category_description { get; set; }
 
-        public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
-
-        [ForeignKey("User")]
-        public Guid User_id { get; set; }
-        public User? User { get; set; }
-
-        [ForeignKey("JobStatus")]
-        public Guid Job_status_id { get; set; }
-        public JobStatus? Job_status { get; set; }
-
-        public List<Product>? Products { get; set; }
+        public DateTimeOffset Created_at { get; set; }
 
     }
 }

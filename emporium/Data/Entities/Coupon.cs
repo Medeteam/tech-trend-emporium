@@ -20,6 +20,5 @@ namespace Data.Entities
 
         public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
 
-        public List<Cart>? Carts { get; set; }
     }
 }

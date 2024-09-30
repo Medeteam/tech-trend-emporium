@@ -22,23 +22,12 @@ namespace Data.Entities
         public required string Image { get; set; }
 
         [JsonPropertyName("price")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
         public uint Stock { get; set; }
 
         public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
-
-        [ForeignKey("User")]
-        public Guid User_id { get; set; }
-        public User? User { get; set; }
-
-        [ForeignKey("JobStatus")]
-        public Guid Job_status_id { get; set; }
-        public JobStatus? Job_status { get; set; }
-
-        [ForeignKey("WishList")]
-        public Guid? Wishlist_id { get; set; }
-        public WishList? WishList { get; set; }
 
         [ForeignKey("Category")]
 
@@ -52,9 +41,7 @@ namespace Data.Entities
         [NotMapped]
         public string? CategoryName {  get; set; }
 
-        public List<ProductToCart>? ProductToCarts { get; set; }
-
-        public List<Review>? Reviews { get; set; }
+        public List<ProductWishList> ProductWishLists { get; set; }
 
     }
 }

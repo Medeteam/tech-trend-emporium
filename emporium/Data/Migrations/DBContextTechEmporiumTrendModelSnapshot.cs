@@ -37,23 +37,22 @@ namespace Data.Migrations
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid>("Order")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("OrdersOrder_id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("Shopping_status_id")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("User_id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Username")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Cart_id");
 
                     b.HasIndex("Coupon_id");
 
-                    b.HasIndex("Shopping_status_id");
+                    b.HasIndex("OrdersOrder_id");
 
-                    b.HasIndex("User_id")
-                        .IsUnique();
+                    b.HasIndex("Shopping_status_id");
 
                     b.ToTable("Carts");
                 });
@@ -77,17 +76,7 @@ namespace Data.Migrations
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("Job_status_id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("User_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Category_id");
-
-                    b.HasIndex("Job_status_id");
-
-                    b.HasIndex("User_id");
 
                     b.ToTable("Categories");
 
@@ -124,22 +113,6 @@ namespace Data.Migrations
                     b.ToTable("Coupons");
                 });
 
-            modelBuilder.Entity("Data.Entities.JobStatus", b =>
-                {
-                    b.Property<Guid>("Job_status_id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Job_status")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("Job_status_id");
-
-                    b.ToTable("Jobs");
-                });
-
             modelBuilder.Entity("Data.Entities.Order", b =>
                 {
                     b.Property<Guid>("Order_id")
@@ -151,29 +124,13 @@ namespace Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<Guid>("Cart_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("Shopping_status_id")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Total_price")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("User_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Order_id");
-
-                    b.HasIndex("Cart_id")
-                        .IsUnique();
-
-                    b.HasIndex("Shopping_status_id");
-
-                    b.HasIndex("User_id");
 
                     b.ToTable("Orders");
                 });
@@ -202,12 +159,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasAnnotation("Relational:JsonPropertyName", "image");
 
-                    b.Property<Guid?>("JobStatusJob_status_id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Job_status_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -221,62 +172,42 @@ namespace Data.Migrations
                     b.Property<long>("Stock")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("User_id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("Wishlist_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Product_id");
 
                     b.HasIndex("Category_id");
-
-                    b.HasIndex("JobStatusJob_status_id");
-
-                    b.HasIndex("Job_status_id");
-
-                    b.HasIndex("User_id");
-
-                    b.HasIndex("Wishlist_id");
 
                     b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Data.Entities.ProductToCart", b =>
                 {
-                    b.Property<Guid>("Product_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("Cart_id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Product_cart_id")
+                    b.Property<Guid>("Product_id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("Product_id", "Cart_id");
+                    b.HasKey("Cart_id", "Product_id");
 
-                    b.HasIndex("Cart_id");
+                    b.HasIndex("Product_id");
 
                     b.ToTable("ProductsToCart");
                 });
 
             modelBuilder.Entity("Data.Entities.ProductWishList", b =>
                 {
-                    b.Property<Guid>("Product_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("Wishlist_id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProductWishList_id")
+                    b.Property<Guid>("Product_id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Product_id", "Wishlist_id");
+                    b.HasKey("Wishlist_id", "Product_id");
 
-                    b.HasIndex("Wishlist_id");
+                    b.HasIndex("Product_id");
 
                     b.ToTable("ProductWishList");
                 });
@@ -348,6 +279,9 @@ namespace Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("Cart_id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
@@ -369,9 +303,16 @@ namespace Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<Guid?>("Wishlist_id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("User_id");
 
+                    b.HasIndex("Cart_id");
+
                     b.HasIndex("Role_id");
+
+                    b.HasIndex("Wishlist_id");
 
                     b.ToTable("Users");
                 });
@@ -385,13 +326,7 @@ namespace Data.Migrations
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("User_id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Wishlist_id");
-
-                    b.HasIndex("User_id")
-                        .IsUnique();
 
                     b.ToTable("WishList");
                 });
@@ -399,124 +334,49 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.Cart", b =>
                 {
                     b.HasOne("Data.Entities.Coupon", "Coupon")
-                        .WithMany("Carts")
+                        .WithMany()
                         .HasForeignKey("Coupon_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Data.Entities.Order", "Orders")
+                        .WithMany()
+                        .HasForeignKey("OrdersOrder_id");
+
                     b.HasOne("Data.Entities.ShoppingStatus", "ShoppingStatus")
                         .WithMany()
                         .HasForeignKey("Shopping_status_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.User", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("Data.Entities.Cart", "User_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Coupon");
 
-                    b.Navigation("ShoppingStatus");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Data.Entities.Category", b =>
-                {
-                    b.HasOne("Data.Entities.JobStatus", "Job_status")
-                        .WithMany("Categories")
-                        .HasForeignKey("Job_status_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.User", "User")
-                        .WithMany("Categories")
-                        .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Job_status");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Data.Entities.Order", b =>
-                {
-                    b.HasOne("Data.Entities.Cart", "Cart")
-                        .WithOne("Order")
-                        .HasForeignKey("Data.Entities.Order", "Cart_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.ShoppingStatus", "ShoppingStatus")
-                        .WithMany()
-                        .HasForeignKey("Shopping_status_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
+                    b.Navigation("Orders");
 
                     b.Navigation("ShoppingStatus");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Data.Entities.Product", b =>
                 {
                     b.HasOne("Data.Entities.Category", "Category")
-                        .WithMany("Products")
-                        .HasForeignKey("Category_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.JobStatus", null)
-                        .WithMany("Products")
-                        .HasForeignKey("JobStatusJob_status_id");
-
-                    b.HasOne("Data.Entities.JobStatus", "Job_status")
                         .WithMany()
-                        .HasForeignKey("Job_status_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.User", "User")
-                        .WithMany("Products")
-                        .HasForeignKey("User_id")
+                        .HasForeignKey("Category_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Data.Entities.WishList", "WishList")
-                        .WithMany("Products")
-                        .HasForeignKey("Wishlist_id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Category");
-
-                    b.Navigation("Job_status");
-
-                    b.Navigation("User");
-
-                    b.Navigation("WishList");
                 });
 
             modelBuilder.Entity("Data.Entities.ProductToCart", b =>
                 {
                     b.HasOne("Data.Entities.Cart", "Cart")
-                        .WithMany("ProductToCarts")
+                        .WithMany()
                         .HasForeignKey("Cart_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.Product", "Product")
-                        .WithMany("ProductToCarts")
+                        .WithMany()
                         .HasForeignKey("Product_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -535,7 +395,7 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Data.Entities.WishList", "WishList")
-                        .WithMany("ProductWishLists")
+                        .WithMany()
                         .HasForeignKey("Wishlist_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -548,98 +408,42 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.Review", b =>
                 {
                     b.HasOne("Data.Entities.Product", "Product")
-                        .WithMany("Reviews")
-                        .HasForeignKey("Product_id")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("Product_id");
 
-                    b.HasOne("Data.Entities.User", "User")
+                    b.HasOne("Data.Entities.User", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("User_id")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("User_id");
 
                     b.Navigation("Product");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Data.Entities.User", b =>
                 {
+                    b.HasOne("Data.Entities.Cart", "Cart")
+                        .WithMany()
+                        .HasForeignKey("Cart_id");
+
                     b.HasOne("Data.Entities.Role", "Role")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("Role_id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("Data.Entities.WishList", b =>
-                {
-                    b.HasOne("Data.Entities.User", "User")
-                        .WithOne("WishList")
-                        .HasForeignKey("Data.Entities.WishList", "User_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
-                });
+                    b.HasOne("Data.Entities.WishList", "WishList")
+                        .WithMany()
+                        .HasForeignKey("Wishlist_id");
 
-            modelBuilder.Entity("Data.Entities.Cart", b =>
-                {
-                    b.Navigation("Order");
-
-                    b.Navigation("ProductToCarts");
-                });
-
-            modelBuilder.Entity("Data.Entities.Category", b =>
-                {
-                    b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Data.Entities.Coupon", b =>
-                {
-                    b.Navigation("Carts");
-                });
-
-            modelBuilder.Entity("Data.Entities.JobStatus", b =>
-                {
-                    b.Navigation("Categories");
-
-                    b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Data.Entities.Product", b =>
-                {
-                    b.Navigation("ProductToCarts");
-
-                    b.Navigation("Reviews");
-                });
-
-            modelBuilder.Entity("Data.Entities.Role", b =>
-                {
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Data.Entities.User", b =>
-                {
                     b.Navigation("Cart");
 
-                    b.Navigation("Categories");
-
-                    b.Navigation("Orders");
-
-                    b.Navigation("Products");
-
-                    b.Navigation("Reviews");
+                    b.Navigation("Role");
 
                     b.Navigation("WishList");
                 });
 
-            modelBuilder.Entity("Data.Entities.WishList", b =>
+            modelBuilder.Entity("Data.Entities.User", b =>
                 {
-                    b.Navigation("ProductWishLists");
-
-                    b.Navigation("Products");
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }
