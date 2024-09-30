@@ -30,29 +30,31 @@ namespace Data.Entities
 
         [ForeignKey("User")]
         public Guid User_id { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [ForeignKey("JobStatus")]
         public Guid Job_status_id { get; set; }
-        public JobStatus Job_status { get; set; }
+        public JobStatus? Job_status { get; set; }
 
         [ForeignKey("WishList")]
         public Guid? Wishlist_id { get; set; }
         public WishList? WishList { get; set; }
 
         [ForeignKey("Category")]
-        
+
         public Guid Category_id { get; set; }
 
-        public Category Category { get; set; }
+        [JsonPropertyName("categoryObject")]
+
+        public Category? Category { get; set; }
 
         [JsonPropertyName("category")]
         [NotMapped]
-        public string CategoryName {  get; set; }
+        public string? CategoryName {  get; set; }
 
-        public List<ProductToCart> ProductToCarts { get; set; }
+        public List<ProductToCart>? ProductToCarts { get; set; }
 
-        public List<ProductWishList> ProductWishLists { get; set; }
+        public List<Review>? Reviews { get; set; }
 
     }
 }

@@ -21,15 +21,16 @@ namespace Data.Entities
 
         [ForeignKey("Role")]
         public Guid Role_id { get; set; }
-        public Role Role { get; set; }
-        public string RoleName => Role?.RoleName;
+        public Role? Role { get; set; }
+        public string? RoleName => Role?.RoleName;
 
-        public WishList WishList { get; set; }
-        public Cart Cart { get; set; }
+        public WishList? WishList { get; set; }
+        public Cart? Cart { get; set; }
 
-        public List<Product> Products { get; set; }
-        public List<Category> Categories { get; set; }
-        public List<Order> Orders { get; set; } = new List<Order>();
+        public List<Product>? Products { get; set; }
+        public List<Review>? Reviews { get; set; }
+        public List<Category>? Categories { get; set; }
+        public List<Order>? Orders { get; set; } = new List<Order>();
 
     }
 }

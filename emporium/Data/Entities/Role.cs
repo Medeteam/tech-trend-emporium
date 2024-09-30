@@ -10,6 +10,6 @@ namespace Data.Entities
         [MaxLength(255)]
         public required string RoleName { get; set; }
 
-        public List<User> Users { get; set; } 
+        public List<User>? Users { get; set; } 
     }
 }

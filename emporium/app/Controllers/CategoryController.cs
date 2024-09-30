@@ -4,6 +4,7 @@ using Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace App.Controllers
 {
@@ -21,6 +22,7 @@ namespace App.Controllers
         }
 
         [HttpPost("sync-categories")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> SyncCategories()
         {
             // Obtener las categorías desde la API de FakeStore
@@ -117,6 +119,7 @@ namespace App.Controllers
         }
 
         [HttpDelete("DeleteCategory/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);

@@ -20,13 +20,13 @@ namespace Data.Entities
 
         [ForeignKey("User")]
         public Guid User_id { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [ForeignKey("JobStatus")]
         public Guid Job_status_id { get; set; }
-        public JobStatus Job_status { get; set; }
+        public JobStatus? Job_status { get; set; }
 
-        public List<Product> Products { get; set; }
+        public List<Product>? Products { get; set; }
 
     }
 }

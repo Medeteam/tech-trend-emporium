@@ -16,15 +16,15 @@ namespace Data.Entities
 
         [ForeignKey("User")]
         public Guid User_id { get; set; }
-        public User User { get; set; }
+        public User ?User { get; set; }
 
         [ForeignKey("ShoppingStatus")]
         public Guid Shopping_status_id { get; set; }
-        public ShoppingStatus ShoppingStatus { get; set; }
+        public ShoppingStatus ?ShoppingStatus { get; set; }
 
         [ForeignKey("Cart")]
         public Guid Cart_id { get; set; }  
-        public Cart Cart { get; set; }  
+        public Cart ?Cart { get; set; }  
 
 
     }
