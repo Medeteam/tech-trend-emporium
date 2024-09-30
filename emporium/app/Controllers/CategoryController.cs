@@ -31,11 +31,6 @@ namespace App.Controllers
                 })
                 .ToList();
 
-            if (!categories.Any())
-            {
-                return NotFound(new { message = "Categories not found" });
-            }
-
             return Ok(categories);
         }
 
