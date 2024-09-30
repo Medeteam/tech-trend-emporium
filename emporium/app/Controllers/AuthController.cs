@@ -75,12 +75,20 @@ namespace App.Controllers
                 Password = userDto.Password,
                 Role_id = role.Role_id
             };
+            var wishList = new WishList
+            {
+                User_id = user.User_id,
+                User = user,
+                Products = [],
+            };
+            user.WishList = wishList;
 
             // Hashear la contraseña
             user.Password = _passwordHasher.HashPassword(user, user.Password);
 
             // Guardar el usuario en la base de datos
             _context.Users.Add(user);
+            _context.WishList.Add(wishList);
             await _context.SaveChangesAsync();
 
             return Ok(new { Message = "User created successfully", UserId = user.User_id });

@@ -38,12 +38,14 @@ namespace Data.Entities
 
         [ForeignKey("WishList")]
         public Guid? Wishlist_id { get; set; }
+        [JsonIgnore]
         public WishList? WishList { get; set; }
 
         [ForeignKey("Category")]
         
         public Guid Category_id { get; set; }
 
+        [JsonPropertyName("categoryObject")]
         public Category Category { get; set; }
 
         [JsonPropertyName("category")]

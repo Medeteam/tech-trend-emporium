@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Data.Entities
 {
@@ -23,7 +24,7 @@ namespace Data.Entities
         public Guid Role_id { get; set; }
         public Role Role { get; set; }
         public string RoleName => Role?.RoleName;
-
+        [JsonIgnore]
         public WishList WishList { get; set; }
         public Cart Cart { get; set; }
 

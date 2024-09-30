@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DBContextTechEmporiumTrend))]
-    partial class DBContextTechEmporiumTrendModelSnapshot : ModelSnapshot
+    [Migration("20240930151502_catname1")]
+    partial class catname1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,8 +95,6 @@ namespace Data.Migrations
                     b.HasIndex("User_id");
 
                     b.ToTable("Categories");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "categoryObject");
                 });
 
             modelBuilder.Entity("Data.Entities.Coupon", b =>
