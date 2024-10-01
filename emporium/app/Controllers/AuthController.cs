@@ -76,6 +76,10 @@ namespace App.Controllers
                 Role_id = role.Role_id
             };
 
+            var wishList = new WishList
+            {};
+            user.WishList = wishList;
+
             // Hashear la contraseña
             user.Password = _passwordHasher.HashPassword(user, user.Password);
 

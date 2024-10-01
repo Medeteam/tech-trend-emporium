@@ -9,22 +9,18 @@ namespace Data.Entities
         public Guid Cart_id { get; set; } = Guid.NewGuid();
         public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
 
-        [ForeignKey("User")]
-        public Guid User_id { get; set; }
-        public User User { get; set; }
-        public string Username { get; set; }
-
         [ForeignKey("Coupon")]
         public Guid Coupon_id { get; set; }
-        public Coupon Coupon { get; set; }
-        public string Coupon_name { get; set; }
+        public Coupon? Coupon { get; set; }
+        public string? Coupon_name { get; set; }
 
         [ForeignKey("ShoppingStatus")]
         public Guid Shopping_status_id { get; set; }
-        public ShoppingStatus ShoppingStatus { get; set; }
+        public ShoppingStatus? ShoppingStatus { get; set; }
 
-        public Order Order { get; set; }
+        [ForeignKey("Order")]
+        public Guid Order { get; set; }
+        public Order? Orders { get; set; }
 
-        public List<ProductToCart> ProductToCarts { get; set; } = new List<ProductToCart>();
     }
 }

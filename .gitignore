@@ -485,3 +485,4 @@ $RECYCLE.BIN/
 
 # Exclude appsetings.Development.json
 **/appsetings.Development.json
+**/Data/Migrations

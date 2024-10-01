@@ -12,20 +12,6 @@ namespace Data.Entities
         [MaxLength(255)]
         public required string Address { get; set; }
 
-        public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
-
-        [ForeignKey("User")]
-        public Guid User_id { get; set; }
-        public User User { get; set; }
-
-        [ForeignKey("ShoppingStatus")]
-        public Guid Shopping_status_id { get; set; }
-        public ShoppingStatus ShoppingStatus { get; set; }
-
-        [ForeignKey("Cart")]
-        public Guid Cart_id { get; set; }  
-        public Cart Cart { get; set; }  
-
-
+        public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now; 
     }
 }
