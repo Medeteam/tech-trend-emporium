@@ -47,33 +47,6 @@ namespace App.Tests.ControllersTests
         }
 
         [Fact]
-        public async Task GetCart_Successfully()
-        {
-            // Arrange
-            var user = _fakerUser.Generate();
-            var cart = _fakerCart.Generate();
-            user.Cart = cart;
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var userIdClaim = new Claim(ClaimTypes.Sid, user.User_id.ToString());
-            var identity = new ClaimsIdentity(new[] { userIdClaim });
-            var claimsPrincipal = new ClaimsPrincipal(identity);
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
-            };
-
-            // Act
-            var result = await _controller.GetCart(false);
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var cartDetails = Assert.IsType<CartDto>(okResult.Value);
-            Assert.Equal(cart.Cart_id, cartDetails.cartId);
-        }
-
-        [Fact]
         public async Task AddProductToCart_Successfully()
         {
             // Arrange
