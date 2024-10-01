@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Data.DTOs;
 
 namespace App.Controllers
 {
@@ -82,5 +83,24 @@ namespace App.Controllers
 
             return Ok("Usuario eliminado con éxito.");
         }
+        [HttpPut("/api/user")]
+        public async Task<IActionResult> UpdateUser(UserDto userDto)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Username == userDto.name);
+
+            if (user == null)
+            {
+                return NotFound("Usuario no encontrado.");
+            }
+            user.Username = userDto.Username;
+            user.Email = userDto.Email;
+            user.Password = userDto.Password;
+            user.Password = _passwordHasher.HashPassword(user, user.Password);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok("User updated successfully");
+        }
     }
 }
+
