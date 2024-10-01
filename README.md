@@ -92,7 +92,10 @@ Este proyecto utiliza varios paquetes de NuGet para añadir funcionalidad clave 
    ```
 
 3. Access the Api
-- Access the API at [http://localhost:5000](http://localhost:5000)
+- Access the API at [http://localhost:5161/swagger/index.html](http://localhost:5161/swagger/index.html)
+
+4. Data Base access
+- To request an acces to Data Base please contac Sebastian Arias Usma, Camilo Velez Palacio or Jhonatan Tamayo Morales Via Microsoft Teams
 
 # Development Strategy
 This project follows the trunk-based development strategy with the following rules:
