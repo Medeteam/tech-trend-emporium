@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Data.DTOs;
 
 namespace App.Controllers
 {
@@ -89,6 +90,23 @@ namespace App.Controllers
             }
 
             return Ok(products);
+        }
+        [HttpPost("api/category")]
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Category_name == categoryDto.name);
+            if (category != null)
+            {
+                return Conflict("Category already exist");
+            }
+            var newCategory = new Category
+            {
+                Category_name = categoryDto.name,
+                Category_description = categoryDto.description
+            };
+            _context.Categories.Add(newCategory);
+            await _context.SaveChangesAsync();
+            return Ok("Category created Successfully");
         }
     }
 }
