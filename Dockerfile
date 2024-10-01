@@ -6,11 +6,13 @@ WORKDIR /src
 COPY emporium/*.sln ./
 COPY emporium/app/*.csproj ./app/
 COPY emporium/Data/*.csproj ./Data/
+COPY emporium/App.Tests/*.csproj ./App.Tests/
 RUN dotnet restore
 
 # Copy the rest of the application code
 COPY emporium/app/. ./app/
 COPY emporium/Data/. ./Data/
+COPY emporium/App.Tests/. ./App.Tests/
 WORKDIR /src/app
 RUN dotnet build -c Release -o /app/build
 
