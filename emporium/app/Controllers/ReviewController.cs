@@ -56,5 +56,21 @@ namespace YourNamespace.Controllers
 
             return Ok(reviews);
         }
+
+        [Route("api/store/reviews/{review_id}")]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteReview(Guid review_id)
+        {
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Review_id == review_id);
+            if (review == null)
+            {
+                return NotFound("Reseña no encontrada.");
+            }
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+
+            return Ok("Reseña eliminada exitosamente.");
+        }
     }
 }
