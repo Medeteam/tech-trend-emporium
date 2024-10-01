@@ -1,6 +1,7 @@
 ﻿using Data;
 using Data.DTOs;
 using Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace YourNamespace.Controllers
         }
         [Route("api/store/products/{product_id}/reviews/add")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddReview(Guid product_id,[FromBody] ReviewRequestDto reviewDto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Username == reviewDto.User ); 
@@ -37,6 +39,7 @@ namespace YourNamespace.Controllers
 
         [Route("api/store/products/{product_id}/reviews")]
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetProductReviews(Guid product_id)
         {
             var product = await _context.Products.Include(p => p.Reviews).ThenInclude(r => r.User).FirstOrDefaultAsync(p => p.Product_id == product_id);
@@ -59,6 +62,7 @@ namespace YourNamespace.Controllers
 
         [Route("api/store/reviews/{review_id}")]
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> DeleteReview(Guid review_id)
         {
             var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Review_id == review_id);

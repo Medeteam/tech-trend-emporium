@@ -1,6 +1,7 @@
 ﻿using Data;
 using Data.DTOs;
 using Data.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -19,6 +20,7 @@ namespace App.Controllers
             _context = context;
         }
         [HttpPost("/api/{user}/wishlist/add/{productId}")]
+        [Authorize]
         public async Task<IActionResult> AddProductToWishList(Guid user, Guid productId)
         {
             // Verificar si el usuario existe
@@ -47,6 +49,7 @@ namespace App.Controllers
 
         }
         [HttpGet("api/{user}/wishlist")]
+        [Authorize]
         public async Task<IActionResult> GetProductsFromWishlist(Guid user)
         {
             var existingUser = await _context.Users.Include(w => w.WishList).ThenInclude(pw => pw.ProductWishLists).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.User_id == user);
@@ -58,6 +61,7 @@ namespace App.Controllers
         }
 
         [HttpDelete("/api/{user}/wishlist/remove/{productId}")]
+        [Authorize]
         public async Task<IActionResult> RemoveProductFromWishList(Guid user, Guid productId)
         {
             var existingUser = await _context.Users.Include(w => w.WishList).ThenInclude(pw => pw.ProductWishLists).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.User_id == user);
