@@ -29,15 +29,6 @@ namespace App.Controllers
             // Buscar al usuario específico "CamiloVelezP"
             var User = _context.Users.FirstOrDefault(u => u.Username == "CamiloVelezP");
 
-            // Obtener el estado de trabajo 'Accepted'
-            var acceptedStatus = _context.Jobs.FirstOrDefault(js => js.Job_status == "Accepted");
-
-            // Validar si se encontró el usuario y el estado
-            if (User == null || acceptedStatus == null)
-            {
-                return BadRequest("Es necesario tener el usuario 'CamiloVelezP' y un estado de trabajo 'Accepted' antes de sincronizar categorías.");
-            }
-
             // Obtener las categorías ya existentes en la base de datos
             var existingCategories = _context.Categories.Select(c => c.Category_name).ToList();
 
@@ -48,8 +39,6 @@ namespace App.Controllers
                 {
                     Category_name = apiCategory,
                     Category_description = $"Categoría agregada desde API, sin descripción adicional.",
-                    User_id = User.User_id, // Asignar siempre el User_id de "CamiloVelezP"
-                    Job_status_id = acceptedStatus.Job_status_id // Asignar el estado 'Accepted'
                 })
                 .ToList();
 
@@ -77,15 +66,6 @@ namespace App.Controllers
             // Buscar al usuario específico "CamiloVelezP"
             var user = _context.Users.FirstOrDefault(u => u.Username == "CamiloVelezP");
 
-            // Obtener el estado de trabajo 'Accepted'
-            var acceptedStatus = _context.Jobs.FirstOrDefault(js => js.Job_status == "Accepted");
-
-            // Validar si se encontró el usuario y el estado
-            if (user == null || acceptedStatus == null)
-            {
-                return BadRequest("Es necesario tener el usuario 'CamiloVelezP' y un estado de trabajo 'Accepted' antes de sincronizar productos.");
-            }
-
             //Obtener las categorias de la base de datos
             var categories = GetCategories();
 
@@ -108,9 +88,6 @@ namespace App.Controllers
                     Image = apiProduct.Image,
                     Price = apiProduct.Price,
                     Stock = 5, // Asignar un stock predeterminado
-                    User_id = user.User_id, // Asignar siempre el User_id de "CamiloVelezP"
-                    Job_status_id = acceptedStatus.Job_status_id, // Siempre asignar el estatus 'Accepted'
-                    Wishlist_id = null // Mantener la wishlist vacía
                 };
 
                 newProducts.Add(newProduct);

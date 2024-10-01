@@ -4,6 +4,7 @@ using Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace App.Controllers
 {
@@ -22,16 +23,12 @@ namespace App.Controllers
         public IActionResult GetCategories()
         {
             var categories = _context.Categories
-                .Include(c => c.User)
-                .Include(c => c.Job_status)
                 .Select(c => new
                 {
                     c.Category_id,
                     c.Category_name,
                     c.Category_description,
                     c.Created_at,
-                    UserName = c.User.Username,
-                    JobStatus = c.Job_status.Job_status
                 })
                 .ToList();
 
@@ -54,8 +51,6 @@ namespace App.Controllers
                     c.Category_name,
                     c.Category_description,
                     c.Created_at,
-                    UserName = c.User.Username,
-                    JobStatus = c.Job_status.Job_status
                 })
                 .FirstOrDefault();
 
@@ -68,6 +63,7 @@ namespace App.Controllers
         }
 
         [HttpDelete("DeleteCategory/{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);
