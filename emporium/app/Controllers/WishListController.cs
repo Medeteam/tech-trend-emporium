@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace App.Controllers
 {

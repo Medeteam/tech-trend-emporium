@@ -33,7 +33,7 @@ namespace App.Controllers
         // Ruta para crear un usuario de tipo Admin (ruta: api/Admin/Auth)
         [HttpPost]
         [Route("api/Admin/Auth")]
-        //[Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> SignupAdmin(UserSignupDto userDto)
         {
             return await SignupUser(userDto, "Admin");

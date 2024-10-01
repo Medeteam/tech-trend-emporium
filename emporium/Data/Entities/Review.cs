@@ -10,14 +10,18 @@ namespace Data.Entities
         [Key]
         public Guid Review_id { get; set; }
 
-        [MaxLength(255)]
-        public string? Review_name { get; set; }
-
         [MaxLength(2000)]
         public string? Review_content { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? Review_rate { get; set;}
+
         [ForeignKey("Product")]
         public Guid? Product_id { get; set; }
-        public Product? Product { get; set; }   
+        public Product? Product { get; set; }
+
+        [ForeignKey("User")]
+        public Guid? User_id { get; set; }
+        public User? User { get; set; }   
     }
 }
