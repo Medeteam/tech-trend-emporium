@@ -209,7 +209,7 @@ namespace Data.Migrations
 
                     b.HasIndex("Product_id");
 
-                    b.ToTable("ProductWishList");
+                    b.ToTable("ProductWishLists");
                 });
 
             modelBuilder.Entity("Data.Entities.Review", b =>
