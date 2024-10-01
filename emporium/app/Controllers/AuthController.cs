@@ -33,7 +33,7 @@ namespace App.Controllers
         // Ruta para crear un usuario de tipo Admin (ruta: api/Admin/Auth)
         [HttpPost]
         [Route("api/Admin/Auth")]
-        //[Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> SignupAdmin(UserSignupDto userDto)
         {
             return await SignupUser(userDto, "Admin");
@@ -75,6 +75,10 @@ namespace App.Controllers
                 Password = userDto.Password,
                 Role_id = role.Role_id
             };
+
+            var wishList = new WishList
+            {};
+            user.WishList = wishList;
 
             // Hashear la contraseña
             user.Password = _passwordHasher.HashPassword(user, user.Password);
