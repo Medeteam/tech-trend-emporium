@@ -63,6 +63,30 @@ namespace App.Controllers
             return Ok(user);
         }
 
+        // Método para filtrar usuarios por su rol
+        [HttpGet("GetUsersByRole/{roleName}")]
+        [Authorize(Policy = "RequireAdminRole")]
+        public IActionResult GetUsersByRole(string roleName)
+        {
+            var users = _context.Users
+                .Where(u => u.Role.RoleName == roleName)  // Filtrar por rol
+                .Select(u => new
+                {
+                    u.User_id,
+                    u.Username,
+                    u.Email,
+                    Role = u.Role.RoleName
+                })
+                .ToList();
+
+            if (!users.Any())
+            {
+                return NotFound($"No se encontraron usuarios con el rol '{roleName}'.");
+            }
+
+            return Ok(users);
+        }
+
 
 
         // Método para eliminar un usuario por ID
