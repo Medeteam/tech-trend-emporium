@@ -98,6 +98,7 @@ namespace App.Controllers
             return Ok(new { message = "Product deleted successfuly" });
         }
         [HttpPost("api/Product")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
         {
             var product = new Product
@@ -120,6 +121,7 @@ namespace App.Controllers
             return Ok("Product Created Successfully");
         }
         [HttpPut("api/Product")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDto productDto)
         {
             var existingProduct = _context.Products.FirstOrDefault(p => p.Product_id == productDto.id);

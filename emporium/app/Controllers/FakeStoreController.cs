@@ -21,7 +21,7 @@ namespace App.Controllers
         }
 
         [HttpPost("sync-categories")]
-        [Authorize(Policy = "RRequireEmployeeOrSuperiorRole")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> SyncCategories()
         {
             // Obtener las categorías desde la API de FakeStore
