@@ -22,11 +22,15 @@ namespace App.Controllers
             _passwordHasher = new PasswordHasher<User>();
         }
 
-        // Método para obtener todos los usuarios (ya implementado)
+        // Método para obtener todos los usuarios
         [HttpGet("GetUsers")]
         [Authorize(Policy = "RequireAdminRole")]
-        public IActionResult GetAllUsers()
+        public IActionResult GetAllUsers(int pageNumber = 1)
         {
+            int pageSize = 5;
+            if (pageNumber <= 0) pageNumber = 1;
+            var totalUsers = _context.Users.Count();
+
             var users = _context.Users
                 .Select(u => new
                 {
@@ -35,10 +39,21 @@ namespace App.Controllers
                     u.Email,
                     Role = u.Role.RoleName
                 })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
 
-            return Ok(users);
+            var result = new
+            {
+                TotalUsers = totalUsers,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Users = users
+            };
+
+            return Ok(result);
         }
+
 
         // Obtener un solo usuario por ID
         [HttpGet("GetUser/{id}")]
@@ -64,7 +79,46 @@ namespace App.Controllers
             return Ok(user);
         }
 
+        // Método para filtrar usuarios por su rol
+        [HttpGet("GetUsersByRole/{roleName}")]
+        [Authorize(Policy = "RequireAdminRole")]
+        public IActionResult GetUsersByRole(string roleName, int pageNumber = 1)
+        {
+            int pageSize = 5;
 
+            if (pageNumber <= 0) pageNumber = 1;
+            var totalUsers = _context.Users
+                .Where(u => u.Role.RoleName == roleName)
+                .Count();
+
+            var users = _context.Users
+                .Where(u => u.Role.RoleName == roleName)
+                .Select(u => new
+                {
+                    u.User_id,
+                    u.Username,
+                    u.Email,
+                    Role = u.Role.RoleName
+                })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            if (!users.Any())
+            {
+                return NotFound($"No se encontraron usuarios con el rol '{roleName}'.");
+            }
+
+            var result = new
+            {
+                TotalUsers = totalUsers,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Users = users
+            };
+
+            return Ok(result);
+        }
 
         // Método para eliminar un usuario por ID
         [HttpDelete("DeleteUser/{id}")]
