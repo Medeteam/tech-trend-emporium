@@ -13,12 +13,12 @@ namespace Data.DTOs
     public class ProductDto
     {
         public required Guid id { get; set; }
-        public string title { get; set; }
+        public required string title { get; set; }
         public decimal price { get; set; }
-        public string description { get; set; }
-        public string category { get; set; }
-        public string image { get; set; }
-        public RatingDto rating { get; set; }
+        public string? description { get; set; }
+        public required string category { get; set; }
+        public string? image { get; set; }
+        public RatingDto? rating { get; set; }
         public uint stock { get; set; }
     }
 }

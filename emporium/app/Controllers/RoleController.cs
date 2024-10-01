@@ -19,7 +19,7 @@ namespace App.Controllers
         }
 
         [HttpPost("create-default-roles")]
-        //[Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> CreateDefaultRoles()
         {
             var defaultRoles = new List<string> { "Admin", "Employee", "Shopper" };

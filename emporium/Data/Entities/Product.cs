@@ -43,6 +43,7 @@ namespace Data.Entities
 
         public List<ProductWishList> ProductWishLists { get; set; }
         public List<ProductToCart> ProductToCart { get; set; }
+        public List<Review>? Reviews { get; set; }
 
     }
 }

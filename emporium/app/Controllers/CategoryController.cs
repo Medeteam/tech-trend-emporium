@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Data.DTOs;
 
 namespace App.Controllers
 {
@@ -19,76 +20,89 @@ namespace App.Controllers
             _context = context;
         }
 
-        [HttpGet("get-categories")]
+        [HttpGet("/category")]
         public IActionResult GetCategories()
         {
             var categories = _context.Categories
-                .Select(c => new
+                .Select(c => new CategoryDto
                 {
-                    c.Category_id,
-                    c.Category_name,
-                    c.Category_description,
-                    c.Created_at,
+                    id = c.Category_id,
+                    name = c.Category_name,
+                    description = c.Category_description
                 })
                 .ToList();
-
-            if (!categories.Any())
-            {
-                return NotFound("No se encontraron categorías en la base de datos.");
-            }
 
             return Ok(categories);
         }
 
-        [HttpGet("GetCategory/{id}")]
+        [HttpGet("/category/{id}")]
         public IActionResult GetCategoryById(Guid id)
         {
             var category = _context.Categories
                 .Where(c => c.Category_id == id)
-                .Select(c => new
+                .Select(c => new CategoryDto
                 {
-                    c.Category_id,
-                    c.Category_name,
-                    c.Category_description,
-                    c.Created_at,
+                    id = c.Category_id,
+                    name = c.Category_name,
+                    description = c.Category_description
                 })
                 .FirstOrDefault();
 
             if (category == null)
             {
-                return NotFound("Categoría no encontrada.");
+                return NotFound(new { message = "Category not found" });
             }
 
             return Ok(category);
         }
 
-        [HttpDelete("DeleteCategory/{id}")]
+        [HttpDelete("/category")]
         [Authorize(Policy = "RequireAdminRole")]
-        public async Task<IActionResult> DeleteCategory(Guid id)
+        public async Task<IActionResult> DeleteCategory([FromBody] Guid id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);
 
             if (category == null)
             {
-                return NotFound("Categoría no encontrada.");
+                return NotFound(new { message = "Category not found" });
             }
 
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            return Ok("Categoría eliminada con éxito.");
+            return Ok(new { message = "Category deleted successfully" });
         }
-        [HttpGet("GetPeoductsByCategory/{category}")]
-        public async Task<IActionResult> GetProductByCategory(string category)
+        [HttpPost("api/category")]
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
-            var products = await _context.Products.Where(
-                p => p.Category.Category_name == category).ToListAsync();
-            if (!products.Any())
+            var category = _context.Categories.FirstOrDefault(c => c.Category_name == categoryDto.name);
+            if (category != null)
             {
-                return NotFound(new { message = "No products found in this category." });
+                return Conflict("Category already exist");
             }
-
-            return Ok(products);
+            var newCategory = new Category
+            {
+                Category_name = categoryDto.name,
+                Category_description = categoryDto.description
+            };
+            _context.Categories.Add(newCategory);
+            await _context.SaveChangesAsync();
+            return Ok("Category created Successfully");
         }
+        [HttpPut("api/category")]
+        public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto categoryDto)
+        {
+            var existingCategory = _context.Categories.FirstOrDefault(c => c.Category_id == categoryDto.id);
+            if (existingCategory == null)
+            {
+                return Conflict("No existing category");
+            }
+            existingCategory.Category_name = categoryDto.name;
+            existingCategory.Category_description = categoryDto.description;
+            _context.Categories.Update(existingCategory);
+            await _context.SaveChangesAsync();
+            return Ok("Product Updated Succesfully");
+        }
+
     }
 }

@@ -209,7 +209,7 @@ namespace Data.Migrations
 
                     b.HasIndex("Product_id");
 
-                    b.ToTable("ProductWishList");
+                    b.ToTable("ProductWishLists");
                 });
 
             modelBuilder.Entity("Data.Entities.Review", b =>
@@ -225,9 +225,8 @@ namespace Data.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<string>("Review_name")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<decimal?>("Review_rate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid?>("User_id")
                         .HasColumnType("uniqueidentifier");
@@ -408,14 +407,16 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.Review", b =>
                 {
                     b.HasOne("Data.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("Reviews")
                         .HasForeignKey("Product_id");
 
-                    b.HasOne("Data.Entities.User", null)
-                        .WithMany("Reviews")
+                    b.HasOne("Data.Entities.User", "User")
+                        .WithMany()
                         .HasForeignKey("User_id");
 
                     b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Data.Entities.User", b =>
@@ -444,10 +445,7 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.Product", b =>
                 {
                     b.Navigation("ProductWishLists");
-                });
 
-            modelBuilder.Entity("Data.Entities.User", b =>
-                {
                     b.Navigation("Reviews");
                 });
 
