@@ -211,22 +211,6 @@ namespace App.Controllers
                 .Include(u => u.Cart)
                 .First();
             userCart.Cart.Coupon = coupon;
-            //    new Coupon
-            //{
-            //    Coupon_name = coupon.Coupon_name,
-            //    Code = coupon.Code,
-            //    Coupon_id = coupon.Coupon_id,
-            //};
-            //var cart = new Cart
-            //{
-            //    Cart_id = userCart.Cart.Cart_id,
-            //    Coupon = new Coupon
-            //    {
-            //        Coupon_name = coupon.Coupon_name,
-            //        Code = coupon.Code,
-            //        Coupon_id = coupon.Coupon_id,
-            //    }
-            //};
 
             _context.Update(userCart);
             _context.SaveChanges();
