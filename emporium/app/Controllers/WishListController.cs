@@ -3,7 +3,9 @@ using Data.DTOs;
 using Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Supabase.Gotrue;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 
 namespace App.Controllers
@@ -20,23 +22,56 @@ namespace App.Controllers
         [HttpPost("/api/{user}/wishlist/add/{productId}")]
         public async Task<IActionResult> AddProductToWishList(Guid user, Guid productId)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(w => w.User_id == user);
-            var exitingItem = await _context.Products
-                .Include(p => p.ProductWishLists)
-                .ThenInclude(w => w.WishList).ToListAsync();
+            // Verificar si el usuario existe
+            var existingUser = await _context.Users.Include(w => w.WishList).ThenInclude(pw => pw.ProductWishLists).ThenInclude(p => p.Product).FirstOrDefaultAsync(u => u.User_id == user);
 
+            // Verificar si el producto ya está en la wishlist
+            var existingWishListItem = existingUser.WishList.ProductWishLists
+                .FirstOrDefault(pw => pw.Product_id == productId);
 
+            if (existingWishListItem != null)
+            {
+                return Conflict("Product already exists in the wishlist.");
+            }
 
-
-
-            //if (
+            // Agregar el producto a la wishlist
+            //var productWishList = new ProductWishList
             //{
-            //    return Conflict("Product Already exist on Wishlist");
-            //}
-            //existingUser.WishList.Products.Add(product);
+            //    Product_id = productId,
+            //    Wishlist_id =
+            //};
+            var asdas = new WishList
+            {
+                ProductWishLists = new List<ProductWishList> {
+                   new(){
+                         Product_id = productId,
+                         Wishlist_id = existingUser.WishList.Wishlist_id
+                   }
+
+               },
+                Created_at = DateTime.Now
+
+            };
+
+            _context.Add(asdas);
+            _context.SaveChanges();
+
+
+
+
+
+
+
+            //insert into productwsih, 
+
+            //_context.WishLi
+
+
+
+            //_context. 00Add(productWishList);
             //await _context.SaveChangesAsync();
-            return Ok(new { Message = "Product Added Successfully", 
-            });
+
+            return Ok(new { Message = "Product added to wishlist successfully." });
 
         }
         //[HttpGet("api/{user}/wishlist")]
