@@ -89,5 +89,20 @@ namespace App.Controllers
             await _context.SaveChangesAsync();
             return Ok("Category created Successfully");
         }
+        [HttpPut("api/category")]
+        public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto categoryDto)
+        {
+            var existingCategory = _context.Categories.FirstOrDefault(c => c.Category_id == categoryDto.id);
+            if (existingCategory == null)
+            {
+                return Conflict("No existing category");
+            }
+            existingCategory.Category_name = categoryDto.name;
+            existingCategory.Category_description = categoryDto.description;
+            _context.Categories.Update(existingCategory);
+            await _context.SaveChangesAsync();
+            return Ok("Product Updated Succesfully");
+        }
+
     }
 }
