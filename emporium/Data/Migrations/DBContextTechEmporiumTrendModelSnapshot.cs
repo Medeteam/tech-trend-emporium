@@ -389,13 +389,13 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.ProductWishList", b =>
                 {
                     b.HasOne("Data.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("ProductWishLists")
                         .HasForeignKey("Product_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.WishList", "WishList")
-                        .WithMany()
+                        .WithMany("ProductWishLists")
                         .HasForeignKey("Wishlist_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -441,9 +441,19 @@ namespace Data.Migrations
                     b.Navigation("WishList");
                 });
 
+            modelBuilder.Entity("Data.Entities.Product", b =>
+                {
+                    b.Navigation("ProductWishLists");
+                });
+
             modelBuilder.Entity("Data.Entities.User", b =>
                 {
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("Data.Entities.WishList", b =>
+                {
+                    b.Navigation("ProductWishLists");
                 });
 #pragma warning restore 612, 618
         }

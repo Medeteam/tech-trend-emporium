@@ -9,6 +9,6 @@ namespace Data.Entities
         public Guid Wishlist_id { get; set; } = Guid.NewGuid();
         public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
 
-        public List<ProductWishList> WishLists { get; set; }
+        public List<ProductWishList> ProductWishLists { get; set; }
     }
 }
