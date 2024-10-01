@@ -27,60 +27,47 @@ namespace App.Controllers
         public async Task<IActionResult> GetCart([FromQuery] bool details = false)
         {
             var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
-            var cartInformation = await _context.Users
+            var userCartInformation = await _context.Users
                 .Where(user => user.User_id == Guid.Parse(userId))
                 .Include(u => u.Cart)
                 .ThenInclude(c => c.ProductToCart)
                 .ThenInclude(ptc => ptc.Product)
                 .ToListAsync();
-            
-            var cartId = cartInformation.Select(u => u.Cart.Cart_id).FirstOrDefault();
+
+            var cartId = userCartInformation.Select(u => u.Cart.Cart_id).FirstOrDefault();
             var totalBeforeDiscount = await GetCartPrice(cartId);
-            var coupon = cartInformation.Select(u => u.Cart.Coupon).FirstOrDefault();
+            var coupon = userCartInformation.Select(u => u.Cart.Coupon).FirstOrDefault();
             var totalAfterDiscount = totalBeforeDiscount;
             if (coupon != null) {
                 totalAfterDiscount = GetDiscountedPrice(totalBeforeDiscount, coupon.Discount);
             }
-            var cartDetails = cartInformation.Select(x => new CartDto
+
+            var cartGeneralInfo = userCartInformation.FirstOrDefault();
+            var cartDetails = new CartDto
             {
                 cartId = cartId,
-                userId = x.User_id,
-                //products = x.Cart.ProductToCart.Select(ptc => new ProductCartDto
-                //{
-                //    id = ptc.Product_id,
-                //    title = ptc.Product.Name,
-                //    price = ptc.Product.Price,
-                //    image = ptc.Product.Image,
-                //    quantity = ptc.Quantity
-                //}).ToList(),
+                userId = cartGeneralInfo.User_id,
                 totalBeforeDiscount = totalBeforeDiscount,
                 totalAfterDiscount = totalAfterDiscount,
-                shippingCost = 5,
+                shippingCost = 5.00m,
                 finalTotal = totalAfterDiscount + 5
-            });
+            };
 
             if (details)
             {
-                var products = cartInformation.Select(x => x.Cart.ProductToCart.Select(ptc => new ProductCartDto
-                {
-                    id = ptc.Product_id,
-                    title = ptc.Product.Name,
-                    price = ptc.Product.Price,
-                    image = ptc.Product.Image,
-                    quantity = ptc.Quantity
-                })).ToList();
-                //cartDetails.pr
+                var products = userCartInformation.SelectMany(x => x.Cart.ProductToCart)
+                    .Select(ptc => new ProductCartDto
+                    {
+                        id = ptc.Product_id,
+                        title = ptc.Product.Name,
+                        price = ptc.Product.Price,
+                        image = ptc.Product.Image,
+                        quantity = ptc.Quantity
+                    }).ToList();
+                cartDetails.products = products;
             }
 
             return Ok(cartDetails);
-            //else
-            //{
-            //    var cartDetails = cartInformation.Select(x => new CartDto { 
-            //        cartId = x.Cart.Cart_id
-            //        userId = x.User_id,
-            //        totalBeforeDiscount = x.Cart.ProductToCart.Pro
-            //    })
-            //}
 
         }
 
@@ -100,14 +87,14 @@ namespace App.Controllers
 
         private decimal GetDiscountedPrice(decimal price, int discount)
         {
-            decimal discounted = price*discount/100;
+            decimal discounted = price * discount / 100;
             return (price - discounted);
         }
 
         [HttpPost]
         [Route("/cart")]
         [Authorize]
-        public async Task<IActionResult> AddProductToCart([FromBody] ProductRequestDto req)
+        public async Task<IActionResult> AddProductToCart([FromBody] ProductRequestDto request)
         {
             var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
             var user = await _context.Users
@@ -115,21 +102,21 @@ namespace App.Controllers
                 .Include(u => u.Cart)
                 .FirstAsync();
             var product = _context.Products
-                .Where(p => p.Product_id == req.productId)
+                .Where(p => p.Product_id == request.productId)
                 .FirstOrDefault();
 
             if (product == null)
             {
                 return NotFound(new { message = "Product not found" });
             }
-            if (req.quantity <= 0 || req.quantity > product.Stock) {
+            if (request.quantity <= 0 || request.quantity > product.Stock) {
                 return Conflict(new { message = "There is not enough stock of this product" });
             }
             var productToAdd = new ProductToCart
             {
                 Cart_id = user.Cart.Cart_id,
-                Product_id = req.productId,
-                Quantity = req.quantity
+                Product_id = request.productId,
+                Quantity = request.quantity
             };
 
             _context.Add(productToAdd);
@@ -138,39 +125,37 @@ namespace App.Controllers
             return Ok(new { message = "Product added successfully" });
         }
 
-        [HttpPost]
-        [Route("/cart/coupon")]
-        [Authorize]
-        public IActionResult ApplyCoupon([FromBody] string code)
-        {
-            var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
-            var coupon = _context.Coupons.Select(c => c)
-                .Where(c => c.Code == code);
-
-            if (!coupon.Any())
-            {
-                return NotFound(new { message = "The coupon doesn't exists" });
-            }
-            //TODO logica de agregar cupon y sumar descuento
-
-            return Ok(new { message = "Coupon applied successfully" });
-        }
-
         [HttpDelete]
         [Route("/cart")]
         [Authorize]
-        public async Task<IActionResult> DeleteProductFromCart([FromBody] Guid productId)
+        public async Task<IActionResult> DeleteProductFromCart([FromBody] DeleteProductRequestDto request)
         {
-            var a = await _context.Carts.ToListAsync();
-            return NotFound();
+            var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
+            var userCart = _context.Users
+                .Where(u => u.User_id == Guid.Parse(userId))
+                .Include(u => u.Cart)
+                .First();
+            var product = _context.ProductsToCart
+                .Where(ptc => ptc.Product_id == request.productId)
+                .Where(ptc => ptc.Cart_id == userCart.Cart.Cart_id)
+                .FirstOrDefault();
+
+            if (product == null)
+            {
+                return NotFound(new { message = "This product is not added to the cart" });
+            }
+
+            _context.Remove(product);
+            _context.SaveChanges();
+            return Ok(new { message = "Product removed from the cart" });
         }
 
         [HttpPut]
         [Route("/cart")]
         [Authorize]
-        public async Task<IActionResult> ChangeProductQuantity([FromBody] ProductRequestDto req)
+        public async Task<IActionResult> ChangeProductQuantity([FromBody] ProductRequestDto request)
         {
-            if(req.quantity <= 0)
+            if (request.quantity <= 0)
             {
                 return Conflict(new { message = "Invalid quantity" });
             }
@@ -182,22 +167,71 @@ namespace App.Controllers
 
             var product = await _context.ProductsToCart
                 .Where(ptc => ptc.Cart_id == user.Cart.Cart_id)
-                .Where(ptc => ptc.Product_id == req.productId)
+                .Where(ptc => ptc.Product_id == request.productId)
                 .FirstOrDefaultAsync();
 
             if (product == null)
             {
                 return NotFound(new { message = "Product not found in cart" });
             }
+            if (product.Product.Stock < request.quantity)
+            {
+                return Conflict(new { message = "There is not enough stock for this item" });
+            }
 
-            // TODO: Add check if req.Quantity > product.stock
-
-            product.Quantity = req.quantity;
+            product.Quantity = request.quantity;
 
             _context.ProductsToCart.Update(product);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Product quantity updated successfully" });
+        }
+
+        [HttpPost]
+        [Route("/cart/coupon")]
+        [Authorize]
+        public async Task<IActionResult> ApplyCoupon([FromBody] CouponRequestDto request)
+        {
+            var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
+            var coupon = _context.Coupons
+                .Where(c => c.Code == request.code)
+                .FirstOrDefault();
+
+            if (coupon == null)
+            {
+                return NotFound(new { message = "The coupon doesn't exists" });
+            }
+            if(coupon.Coupon_status == false)
+            {
+                return Conflict(new { message = "The coupon is not valid" });
+            }
+            //TODO logica de agregar cupon y sumar descuento
+            var userCart = _context.Users
+                .Where(u => u.User_id == Guid.Parse(userId))
+                .Include(u => u.Cart)
+                .First();
+            userCart.Cart.Coupon = coupon;
+            //    new Coupon
+            //{
+            //    Coupon_name = coupon.Coupon_name,
+            //    Code = coupon.Code,
+            //    Coupon_id = coupon.Coupon_id,
+            //};
+            //var cart = new Cart
+            //{
+            //    Cart_id = userCart.Cart.Cart_id,
+            //    Coupon = new Coupon
+            //    {
+            //        Coupon_name = coupon.Coupon_name,
+            //        Code = coupon.Code,
+            //        Coupon_id = coupon.Coupon_id,
+            //    }
+            //};
+
+            _context.Update(userCart);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Coupon applied successfully" });
         }
     }
 }
