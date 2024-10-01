@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace YourNamespace.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class ReviewsController : ControllerBase
     {
@@ -34,6 +33,28 @@ namespace YourNamespace.Controllers
             _context.Reviews.Add(newReview);
             await _context.SaveChangesAsync();
             return Ok("Review added to product successfully");
+        }
+
+        [Route("api/store/products/{product_id}/reviews")]
+        [HttpGet]
+        public async Task<IActionResult> GetProductReviews(Guid product_id)
+        {
+            var product = await _context.Products.Include(p => p.Reviews).ThenInclude(r => r.User).FirstOrDefaultAsync(p => p.Product_id == product_id);
+
+            if (product == null)
+            {
+                return NotFound("Producto no encontrado.");
+            }
+
+            var reviews = product.Reviews.Select(r => new
+            {
+                r.Review_id,
+                r.Review_content,
+                r.Review_rate,
+                User = r.User.Username
+            });
+
+            return Ok(reviews);
         }
     }
 }
