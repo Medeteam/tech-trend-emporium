@@ -79,6 +79,8 @@ namespace App.Controllers
             var wishList = new WishList
             {};
             user.WishList = wishList;
+            var cart = new Cart { };
+            user.Cart = cart;
 
             // Hashear la contraseña
             user.Password = _passwordHasher.HashPassword(user, user.Password);
