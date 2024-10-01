@@ -75,23 +75,6 @@ namespace App.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { Message = "Product removed from wishlist successfully." });
-            //    var ExistingUser = await _context.Users.Include("W").FirstOrDefaultAsync(w => w.User_id == user);
-            //    if (ExistingUser == null)
-            //    {
-            //        return Conflict("User does not exist");
-            //    }
-            //    var product = await _context.Products.FirstOrDefaultAsync(p => p.Product_id == productId);
-            //    if (product == null)
-            //    {
-            //        return Conflict("Product does not exist");
-            //    }
-            //    if (!ExistingUser.WishList.Products.Contains(product))
-            //    {
-            //        return Conflict("Product does not exist in the Wishlist");
-            //    }
-            //    ExistingUser.WishList.Products.Remove(product);
-            //    await _context.SaveChangesAsync();
-            //    return Ok(new { Message = "Product removed successfully", Product = product.Name });
         }
         }
 }
