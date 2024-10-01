@@ -138,6 +138,7 @@ namespace App.Controllers
             return Ok("Usuario eliminado con éxito.");
         }
         [HttpPut("/api/user")]
+        [Authorize("RequireAdminRole")]
         public async Task<IActionResult> UpdateUser(UserDto userDto)
         {
             var user = _context.Users.FirstOrDefault(u => u.Username == userDto.name);

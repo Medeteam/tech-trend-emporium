@@ -21,6 +21,7 @@ namespace App.Controllers
         }
 
         [HttpGet("/category")]
+        [Authorize]
         public IActionResult GetCategories()
         {
             var categories = _context.Categories
@@ -36,6 +37,7 @@ namespace App.Controllers
         }
 
         [HttpGet("/category/{id}")]
+        [Authorize]
         public IActionResult GetCategoryById(Guid id)
         {
             var category = _context.Categories
@@ -73,6 +75,7 @@ namespace App.Controllers
             return Ok(new { message = "Category deleted successfully" });
         }
         [HttpPost("api/category")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Category_name == categoryDto.name);
@@ -90,6 +93,7 @@ namespace App.Controllers
             return Ok("Category created Successfully");
         }
         [HttpPut("api/category")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto categoryDto)
         {
             var existingCategory = _context.Categories.FirstOrDefault(c => c.Category_id == categoryDto.id);
