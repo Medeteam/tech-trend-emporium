@@ -85,5 +85,51 @@ namespace App.Controllers
 
             return Ok("Producto eliminado con éxito.");
         }
+        [HttpPost("api/Product")]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
+        {
+            var product = new Product
+            {
+                Name = productDto.title,
+                Description = productDto.description,
+                Image = productDto.image,
+                Price = productDto.price,
+                Stock = productDto.stock,
+                CategoryName = productDto.category
+            };
+            var category = _context.Categories.FirstOrDefault(c => c.Category_name == product.CategoryName);
+            if (category == null)
+            {
+                return Conflict("No category found for this product");
+            }
+            product.Category_id = category.Category_id;
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return Ok("Product Created Successfully");
+        }
+        [HttpPut("api/Product")]
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductDto productDto)
+        {
+            var existingProduct = _context.Products.FirstOrDefault(p => p.Product_id == productDto.id);
+            if (existingProduct == null)
+            {
+                return Conflict("No existing product");
+            }
+            var existingCategory = _context.Categories.FirstOrDefault(c => c.Category_name == productDto.category);
+            if(existingCategory== null)
+            {
+                return Conflict("No existing category");
+            }
+            existingProduct.Name = productDto.title;
+            existingProduct.Description = productDto.description;
+            existingProduct.Image = productDto.image;
+            existingProduct.Stock = productDto.stock;
+            existingProduct.Price = productDto.price;
+            existingProduct.CategoryName = productDto.category;
+            _context.Products.Update(existingProduct);
+            await _context.SaveChangesAsync();
+            return Ok("Product Updated Succesfully");
+        }
+
     }
 }
