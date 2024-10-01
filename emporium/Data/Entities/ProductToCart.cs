@@ -6,7 +6,7 @@ namespace Data.Entities
     public class ProductToCart
     {
 
-        public int? Quantity { get; set; }
+        public required int Quantity { get; set; }
 
         [ForeignKey("Cart")]
         public Guid Cart_id { get; set; }

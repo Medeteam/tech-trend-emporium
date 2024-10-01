@@ -2,8 +2,10 @@
 using Data.DTOs;
 using Data.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Security.Claims;
 
 namespace App.Controllers
@@ -25,44 +27,52 @@ namespace App.Controllers
         public async Task<IActionResult> GetCart([FromQuery] bool details = false)
         {
             var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
-            //var cartDetails = _context.Users
-            //    .Where(user => user.User_id == Guid.Parse(userId)) 
-            //    .Select(user => new
-            //    {
-            //        UserId = user.User_id,
-            //        CartId = user.Cart.Cart_id,
-            //        Products = user.Cart.ProductToCart
-            //            .Select(ptc => new
-            //            {
-            //                ProductName = ptc.Product.Name,
-            //                ProductPrice = ptc.Product.Price
-            //            })
-            //    })
-            //    .ToList();
             var cartInformation = await _context.Users
                 .Where(user => user.User_id == Guid.Parse(userId))
                 .Include(u => u.Cart)
                 .ThenInclude(c => c.ProductToCart)
                 .ThenInclude(ptc => ptc.Product)
                 .ToListAsync();
+            
+            var cartId = cartInformation.Select(u => u.Cart.Cart_id).FirstOrDefault();
+            var totalBeforeDiscount = await GetCartPrice(cartId);
+            var coupon = cartInformation.Select(u => u.Cart.Coupon).FirstOrDefault();
+            var totalAfterDiscount = totalBeforeDiscount;
+            if (coupon != null) {
+                totalAfterDiscount = GetDiscountedPrice(totalBeforeDiscount, coupon.Discount);
+            }
+            var cartDetails = cartInformation.Select(x => new CartDto
+            {
+                cartId = cartId,
+                userId = x.User_id,
+                //products = x.Cart.ProductToCart.Select(ptc => new ProductCartDto
+                //{
+                //    id = ptc.Product_id,
+                //    title = ptc.Product.Name,
+                //    price = ptc.Product.Price,
+                //    image = ptc.Product.Image,
+                //    quantity = ptc.Quantity
+                //}).ToList(),
+                totalBeforeDiscount = totalBeforeDiscount,
+                totalAfterDiscount = totalAfterDiscount,
+                shippingCost = 5,
+                finalTotal = totalAfterDiscount + 5
+            });
+
             if (details)
             {
-                var cartDetails = cartInformation.Select(x => new CartDto
+                var products = cartInformation.Select(x => x.Cart.ProductToCart.Select(ptc => new ProductCartDto
                 {
-                    cartId = x.Cart.Cart_id,
-                    userId = x.User_id,
-                    products = x.Cart.ProductToCart.Select(ptc => new ProductDto
-                    {
-                        id = ptc.Product_id,
-                        title = ptc.Product.Name,
-                        price = ptc.Product.Price,
-                        image = ptc.Product.Image,
-                    }).ToList(),
-                });
-
-                return Ok(cartDetails);
+                    id = ptc.Product_id,
+                    title = ptc.Product.Name,
+                    price = ptc.Product.Price,
+                    image = ptc.Product.Image,
+                    quantity = ptc.Quantity
+                })).ToList();
+                //cartDetails.pr
             }
-            return Ok();
+
+            return Ok(cartDetails);
             //else
             //{
             //    var cartDetails = cartInformation.Select(x => new CartDto { 
@@ -72,6 +82,26 @@ namespace App.Controllers
             //    })
             //}
 
+        }
+
+        private async Task<decimal> GetCartPrice(Guid cartId)
+        {
+            var products = await _context.ProductsToCart
+                .Where(ptc => ptc.Cart_id == cartId)
+                .Include(ptc => ptc.Product)
+                .ToListAsync();
+            decimal total = 0;
+            foreach (var product in products)
+            {
+                total += product.Quantity * product.Product.Price;
+            }
+            return total;
+        }
+
+        private decimal GetDiscountedPrice(decimal price, int discount)
+        {
+            decimal discounted = price*discount/100;
+            return (price - discounted);
         }
 
         [HttpPost]

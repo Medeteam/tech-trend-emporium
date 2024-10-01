@@ -10,10 +10,10 @@ namespace Data.DTOs
     {
         public required Guid userId { get; set; }
         public required Guid cartId { get; set; }
-        public List<ProductDto>? products { get; set; }
-        public double? totalBeforeDiscount { get; set; }
-        public double? totalAfterDiscount { get; set; }
-        public double shippingCost { get; set; }
-        public double finalTotal {  get; set; }
+        public List<ProductCartDto>? products { get; set; }
+        public decimal? totalBeforeDiscount { get; set; }
+        public decimal? totalAfterDiscount { get; set; }
+        public decimal shippingCost { get; set; }
+        public decimal finalTotal {  get; set; }
     }
 }
