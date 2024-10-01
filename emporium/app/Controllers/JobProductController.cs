@@ -37,6 +37,7 @@ namespace App.Controllers
             await _context.SaveChangesAsync();
             return Ok("Product Created Successfully");
         }
+        
         [HttpPost("api/category")]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
