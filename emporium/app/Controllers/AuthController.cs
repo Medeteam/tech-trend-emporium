@@ -2,7 +2,6 @@
 using Data.DTOs;
 using Data.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +20,7 @@ namespace App.Controllers
             _passwordHasher = new PasswordHasher<User>();
         }
 
-        // Ruta para crear un usuario de tipo Shopper (ruta: api/Auth)
+        // Endpoint to create users with Shopper role (route: api/Auth)
         [HttpPost]
         [Route("api/Auth")]
         [AllowAnonymous] 
@@ -48,10 +47,10 @@ namespace App.Controllers
             return await SignupUser(userDto, "Employee");
         }
 
-        // Método común para crear un usuario con el rol proporcionado
+        // Common method to create an user with a specific role
         private async Task<IActionResult> SignupUser(UserSignupDto userDto, string roleName)
         {
-            // Verificar si el usuario o el correo ya existen
+            // Verify if username or email alredy exists
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username);
             var existingEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDto.Email);
 
@@ -60,20 +59,21 @@ namespace App.Controllers
                 return Conflict("The username or email is already registered.");
             }
 
-            // Obtener el rol basado en el nombre del rol
+            // Get Role object based on role's name
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == roleName);
             if (role == null)
             {
                 return BadRequest("Invalid role.");
             }
 
-            // Crear un nuevo usuario
+            // Create new user
             var user = new User
             {
                 Username = userDto.Username,
                 Email = userDto.Email,
                 Password = userDto.Password,
-                Role_id = role.Role_id
+                Role = role
+                //Role_id = role.Role_id
             };
 
             var wishList = new WishList
@@ -82,14 +82,19 @@ namespace App.Controllers
             var cart = new Cart { };
             user.Cart = cart;
 
-            // Hashear la contraseña
+            // Hash the password
             user.Password = _passwordHasher.HashPassword(user, user.Password);
 
-            // Guardar el usuario en la base de datos
+            // Save user in the database
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "User created successfully", UserId = user.User_id });
+            return Ok(new {
+                message = "User created successfully",
+                id = user.User_id,
+                email = user.Email,
+                username = user.Username
+            });
         }
     }
 }

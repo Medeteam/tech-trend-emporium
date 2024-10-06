@@ -1,16 +1,14 @@
 ﻿using Data.Entities;
 using Data.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DotNetEnv;
 using System.Security.Claims;
 using Data;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Identity.Client;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Controllers
 {
@@ -31,31 +29,46 @@ namespace App.Controllers
 
         #region Login
 
+        // Endpoint to log in all kind of users (route: api/login)
         [AllowAnonymous]
         [HttpPost("api/login")]
         public IActionResult Login([FromBody] UserLoginDto userLogin)
         {
+            if(Request.Cookies.TryGetValue("Authorization", out string cookie))
+            {
+                var validToken = CheckValidTokenExpiration(cookie);
+                if (validToken)
+                {
+                    return Conflict(new { message = "User alredy logged in" });
+                }
+            }
+
             var user = AuthenticateUser(userLogin);
 
             if (user != null)
             {
-                var token = GenerateJWTToken(user);
+                var tokenExpiration = DateTime.Now.AddMinutes(30);
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.Now.AddMinutes(120), 
+                    Expires = tokenExpiration, 
                     Secure = true
                 };
+                var token = GenerateJWTToken(user, tokenExpiration);
 
-                Response.Cookies.Append("Authorization", token, cookieOptions); // Añadir el token a la cookie
-                return Ok(new { token });
+                Response.Cookies.Append("Authorization", token, cookieOptions); // Add token to the cookie
+                return Ok(new { 
+                    token = token,
+                    email = user.Email,
+                    username = user.Username
+                });
             }
 
             return NotFound("User not found");
         }
 
-        private string GenerateJWTToken(User user)
+        private string GenerateJWTToken(User user, DateTime tokenExpiration)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -70,7 +83,7 @@ namespace App.Controllers
             var token = new JwtSecurityToken(
                 issuer: _jwtIssuer,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: tokenExpiration,
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -78,19 +91,21 @@ namespace App.Controllers
 
         private User? AuthenticateUser(UserLoginDto userLogin)
         {
-            // Buscar al usuario por su nombre de usuario en la base de datos
-            var user = _context.Users.FirstOrDefault(u => u.Username == userLogin.Username);
+            // Search User by the username in the DB
+            var user = _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.Username == userLogin.Username);
 
             if (user != null)
             {
-                // Usar PasswordHasher para verificar la contraseña en texto plano contra la hasheada
+                // Use PasswordHasher to compare plain text vs hashed password
                 var passwordHasher = new PasswordHasher<User>();
                 var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.Password, userLogin.Password);
 
-                // Si la verificación es exitosa, devolver el usuario
+                // If password is correct, return User
                 if (passwordVerificationResult == PasswordVerificationResult.Success)
                 {
-                    // Cargar el rol del usuario
+                    // Load user Role
                     var role = GetRoleById(user.Role_id);
                     if (role != null)
                     {
@@ -100,7 +115,7 @@ namespace App.Controllers
                 }
             }
 
-            // Si no se encuentra o la contraseña no coincide, devolver null
+            // If user doesn't exists or password is incorrect, return null
             return null;
         }
 
@@ -110,10 +125,33 @@ namespace App.Controllers
             return role;
         }
 
+        private bool CheckValidTokenExpiration(string cookie)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(cookie) as JwtSecurityToken;
+
+            if (jwtToken != null)
+            {
+                var expClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "exp")?.Value;
+
+                if (expClaim != null && long.TryParse(expClaim, out long exp))
+                {
+                    var expirationDate = DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime;
+
+                    if (expirationDate > DateTime.UtcNow)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         #endregion
 
         #region Logout
 
+        // Endpoint to log out (route: api/logout)
         [HttpPost("api/logout")]
         [Authorize]
         public IActionResult Logout()
