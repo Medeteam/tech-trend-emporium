@@ -35,21 +35,26 @@ namespace App.Controllers
                 .Include(u => u.Cart)
                 .ThenInclude(c => c.ProductToCart)
                 .ThenInclude(ptc => ptc.Product)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
-            var cartId = userCartInformation.Select(u => u.Cart.Cart_id).FirstOrDefault();
+            if(userCartInformation == null)
+            {
+                return Forbid();
+            }
+
+            var cartId = userCartInformation.Cart.Cart_id;
+            var coupon = userCartInformation.Cart.Coupon;
             var totalBeforeDiscount = await GetCartPrice(cartId);
-            var coupon = userCartInformation.Select(u => u.Cart.Coupon).FirstOrDefault();
+
             var totalAfterDiscount = totalBeforeDiscount;
             if (coupon != null) {
                 totalAfterDiscount = GetDiscountedPrice(totalBeforeDiscount, coupon.Discount);
             }
 
-            var cartGeneralInfo = userCartInformation.FirstOrDefault();
             var cartDetails = new CartDto
             {
                 cartId = cartId,
-                userId = cartGeneralInfo.User_id,
+                userId = userCartInformation.User_id,
                 totalBeforeDiscount = totalBeforeDiscount,
                 totalAfterDiscount = totalAfterDiscount,
                 shippingCost = 5.00m,
@@ -74,8 +79,8 @@ namespace App.Controllers
 
             if (details)
             {
-                var products = userCartInformation.SelectMany(x => x.Cart.ProductToCart)
-                    .Select(ptc => new ProductCartDto
+                var productToCart = userCartInformation.Cart.ProductToCart;
+                var products = productToCart.Select(ptc => new ProductCartDto
                     {
                         id = ptc.Product_id,
                         title = ptc.Product.Name,
