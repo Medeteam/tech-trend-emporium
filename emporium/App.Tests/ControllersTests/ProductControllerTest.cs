@@ -98,7 +98,7 @@ namespace App.Tests.ControllersTests
             ClearContext();
             var mockProduct = _faker.Generate();
             var faker = new Faker();
-            var mockCategory = faker.Commerce.Categories(1).First();
+            var mockCategory = "NotExistingCategory";
 
             _context.Products.Add(mockProduct);
             _context.SaveChanges();
