@@ -8,7 +8,7 @@ namespace Data.DTOs
 {
     public class RatingDto
     {
-        public double Rate { get; set; }
+        public decimal Rate { get; set; }
         public int Count { get; set; }
     }
 }

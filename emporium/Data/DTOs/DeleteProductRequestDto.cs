@@ -8,6 +8,6 @@ namespace Data.DTOs
 {
     public class DeleteProductRequestDto
     {
-        public Guid productId { get; set; }
+        public Guid id { get; set; }
     }
 }
