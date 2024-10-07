@@ -1,12 +1,9 @@
-﻿using App.Services;
-using Data.Entities;
+﻿using Data.Entities;
 using Data;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Data.DTOs;
-using Polly;
 
 namespace App.Controllers
 {
