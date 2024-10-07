@@ -10,8 +10,8 @@ using System.Security.Claims;
 
 namespace App.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("/api")]
     public class CartController : ControllerBase
     {
         private readonly DBContextTechEmporiumTrend _context;
@@ -21,14 +21,17 @@ namespace App.Controllers
             _context = context;
         }
 
+        // Endpoint to get products from cart (route: api/cart)
         [HttpGet]
-        [Route("/cart")]
+        [Route("cart")]
         [Authorize]
         public async Task<IActionResult> GetCart([FromQuery] bool details = false)
         {
             var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
             var userCartInformation = await _context.Users
                 .Where(user => user.User_id == Guid.Parse(userId))
+                .Include(u => u.Cart)
+                .ThenInclude(c => c.Coupon)
                 .Include(u => u.Cart)
                 .ThenInclude(c => c.ProductToCart)
                 .ThenInclude(ptc => ptc.Product)
@@ -52,6 +55,22 @@ namespace App.Controllers
                 shippingCost = 5.00m,
                 finalTotal = totalAfterDiscount + 5
             };
+            if(coupon != null)
+            {
+                cartDetails.coupon = new CartCouponDto
+                {
+                    couponCode = coupon.Code,
+                    discount = coupon.Discount
+                };
+            }
+            else
+            {
+                cartDetails.coupon = new CartCouponDto
+                {
+                    couponCode = "None",
+                    discount = 0
+                };
+            }
 
             if (details)
             {
@@ -88,11 +107,13 @@ namespace App.Controllers
         private decimal GetDiscountedPrice(decimal price, int discount)
         {
             decimal discounted = price * discount / 100;
-            return (price - discounted);
+            decimal finalPrice = price - discounted;
+            return Math.Round(finalPrice, 2);
         }
 
+        // Endpoint to add a product to the cart (route: api/cart)
         [HttpPost]
-        [Route("/cart")]
+        [Route("cart")]
         [Authorize]
         public async Task<IActionResult> AddProductToCart([FromBody] ProductRequestDto request)
         {
@@ -125,8 +146,9 @@ namespace App.Controllers
             return Ok(new { message = "Product added successfully" });
         }
 
+        // Endpoint to remove a product from cart (route: api/cart)
         [HttpDelete]
-        [Route("/cart")]
+        [Route("cart")]
         [Authorize]
         public async Task<IActionResult> DeleteProductFromCart([FromBody] DeleteProductRequestDto request)
         {
@@ -150,8 +172,9 @@ namespace App.Controllers
             return Ok(new { message = "Product removed from the cart" });
         }
 
+        // Endpoint to change the quantity of a product in the cart (route: api/cart)
         [HttpPut]
-        [Route("/cart")]
+        [Route("cart")]
         [Authorize]
         public async Task<IActionResult> ChangeProductQuantity([FromBody] ProductRequestDto request)
         {
@@ -187,15 +210,16 @@ namespace App.Controllers
             return Ok(new { message = "Product quantity updated successfully" });
         }
 
+        // Endpoint to add a coupon to the cart (route: api/cart)
         [HttpPost]
-        [Route("/cart/coupon")]
+        [Route("cart/coupon")]
         [Authorize]
         public async Task<IActionResult> ApplyCoupon([FromBody] CouponRequestDto request)
         {
             var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
-            var coupon = _context.Coupons
+            var coupon = await _context.Coupons
                 .Where(c => c.Code == request.code)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (coupon == null)
             {
@@ -209,13 +233,42 @@ namespace App.Controllers
             var userCart = _context.Users
                 .Where(u => u.User_id == Guid.Parse(userId))
                 .Include(u => u.Cart)
+                .ThenInclude(c => c.Coupon)
                 .First();
-            userCart.Cart.Coupon = coupon;
+            if (userCart.Cart.Coupon != null)
+            {
+                return Conflict(new { message = "The cart alredy has a coupon" });
+            }
+
+            userCart.Cart.Coupon_id = coupon.Coupon_id;
+            //userCart.Cart.Coupon = coupon;
 
             _context.Update(userCart);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Coupon applied successfully" });
+        }
+
+        [HttpDelete]
+        [Route("cart/coupon")]
+        [Authorize]
+        public async Task<IActionResult> RemoveCoupon()
+        {
+            var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
+            var userCart = await _context.Users
+                .Where(u => u.User_id == Guid.Parse(userId))
+                .Include(u => u.Cart)
+                .ThenInclude(c => c.Coupon)
+                .FirstAsync();
+            if(userCart.Cart.Coupon == null)
+            {
+                return Conflict(new { message = "There is no coupon applied" });
+            }
+            userCart.Cart.Coupon = null;
+            _context.Update(userCart);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Coupon deleted successfully" });
         }
     }
 }
