@@ -11,6 +11,7 @@ namespace Data.DTOs
         public required Guid userId { get; set; }
         public required Guid cartId { get; set; }
         public List<ProductCartDto>? products { get; set; }
+        public CartCouponDto coupon { get; set; }
         public decimal? totalBeforeDiscount { get; set; }
         public decimal? totalAfterDiscount { get; set; }
         public decimal shippingCost { get; set; }
