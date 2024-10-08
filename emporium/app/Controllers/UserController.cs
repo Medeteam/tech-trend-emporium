@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Data.DTOs;
+using System.Security.Claims;
 
 namespace App.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api")]
     public class UserController : ControllerBase
     {
         private readonly DBContextTechEmporiumTrend _context;
@@ -22,8 +23,8 @@ namespace App.Controllers
             _passwordHasher = new PasswordHasher<User>();
         }
 
-        // Método para obtener todos los usuarios
-        [HttpGet("GetUsers")]
+        // Endpoint to get all users (route: api/user)
+        [HttpGet("user")]
         [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetAllUsers(int pageNumber = 1)
         {
@@ -55,8 +56,8 @@ namespace App.Controllers
         }
 
 
-        // Obtener un solo usuario por ID
-        [HttpGet("GetUser/{id}")]
+        // Endpoint to get an user by id (route: api/user/{id})
+        [HttpGet("user/{id}")]
         [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetUserById(Guid id)
         {
@@ -73,14 +74,14 @@ namespace App.Controllers
 
             if (user == null)
             {
-                return NotFound("Usuario no encontrado.");
+                return NotFound("User not found");
             }
 
             return Ok(user);
         }
 
-        // Método para filtrar usuarios por su rol
-        [HttpGet("GetUsersByRole/{roleName}")]
+        // Endpoint to get all users by specific role (route: api/user/role/{rolename})
+        [HttpGet("user/role/{roleName}")]
         [Authorize(Policy = "RequireAdminRole")]
         public IActionResult GetUsersByRole(string roleName, int pageNumber = 1)
         {
@@ -106,7 +107,7 @@ namespace App.Controllers
 
             if (!users.Any())
             {
-                return NotFound($"No se encontraron usuarios con el rol '{roleName}'.");
+                return NotFound($"Not found users with the role '{roleName}'.");
             }
 
             var result = new
@@ -120,24 +121,30 @@ namespace App.Controllers
             return Ok(result);
         }
 
-        // Método para eliminar un usuario por ID
-        [HttpDelete("DeleteUser/{id}")]
+        // Endpoint to delete an users (route: api/user)
+        [HttpDelete("user/{id}")]
         [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
+            var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
             var user = _context.Users.FirstOrDefault(u => u.User_id == id);
 
             if (user == null)
             {
-                return NotFound("Usuario no encontrado.");
+                return NotFound(new { message = "User not found" });
+            }
+            if (userId == user.User_id.ToString()) {
+                return Conflict(new { message = "User can not be deleted" });
             }
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
-            return Ok("Usuario eliminado con éxito.");
+            return Ok(new { message = "User deleted successfully" });
         }
-        [HttpPut("/api/user")]
+
+        // Endpoint to modify all users (route: api/user)
+        [HttpPut("user")]
         [Authorize("RequireAdminRole")]
         public async Task<IActionResult> UpdateUser(UserDto userDto)
         {
@@ -145,7 +152,7 @@ namespace App.Controllers
 
             if (user == null)
             {
-                return NotFound("Usuario no encontrado.");
+                return NotFound(new { message = "User not found" });
             }
             user.Username = userDto.Username;
             user.Email = userDto.Email;
@@ -154,7 +161,7 @@ namespace App.Controllers
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            return Ok("User updated successfully");
+            return Ok(new { message = "User updated successfully" });
         }
     }
 }
