@@ -29,15 +29,14 @@ namespace App.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
             var userCartInformation = await _context.Users
-                .Where(user => user.User_id == Guid.Parse(userId))
+                .Where(u => u.User_id == Guid.Parse(userId))
                 .Include(u => u.Cart)
                 .ThenInclude(c => c.Coupon)
                 .Include(u => u.Cart)
                 .ThenInclude(c => c.ProductToCart)
-                .ThenInclude(ptc => ptc.Product)
                 .FirstOrDefaultAsync();
 
-            if(userCartInformation == null)
+            if (userCartInformation == null)
             {
                 return Forbid();
             }
