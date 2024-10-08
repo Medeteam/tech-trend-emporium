@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace App.Tests.ControllersTests
 {
@@ -36,10 +38,10 @@ namespace App.Tests.ControllersTests
                 .RuleFor(u => u.Role, f => new Role { RoleName = f.PickRandom(new[] { "Admin", "User" }) });
         }
 
-        private void ClearContext()
+        private async void ClearContext()
         {
             _context.Users.RemoveRange(_context.Users);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         [Fact]
@@ -51,8 +53,22 @@ namespace App.Tests.ControllersTests
             var id = mockUser.User_id;
 
             _context.Users.Add(mockUser);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             var usersBeforeDelete = _context.Users.Count();
+
+            // Mock user claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Sid, Guid.NewGuid().ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            // Set the User property in the controller
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
 
             // Act
             var result = await _controller.DeleteUser(id);
@@ -72,7 +88,21 @@ namespace App.Tests.ControllersTests
             var id = Guid.NewGuid(); // ID que no existe en la base de datos
 
             _context.Users.Add(mockUser);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            // Mock user claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Sid, Guid.NewGuid().ToString())
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+
+            // Set the User property in the controller
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
 
             // Act
             var result = await _controller.DeleteUser(id);
