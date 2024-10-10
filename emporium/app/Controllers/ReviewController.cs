@@ -4,12 +4,12 @@ using Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace YourNamespace.Controllers
 {
     [ApiController]
+    [Route("/api")]
     public class ReviewsController : ControllerBase
     {
         private readonly DBContextTechEmporiumTrend _context;
@@ -18,7 +18,9 @@ namespace YourNamespace.Controllers
         {
             _context = context;
         }
-        [Route("api/store/products/{product_id}/reviews/add")]
+
+        // Endpoint add the review for a product (route: api/store/products/{product_id}/reviews/add)
+        [Route("store/products/{product_id}/reviews/add")]
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddReview(Guid product_id,[FromBody] ReviewRequestDto reviewDto)
@@ -34,47 +36,54 @@ namespace YourNamespace.Controllers
 
             _context.Reviews.Add(newReview);
             await _context.SaveChangesAsync();
-            return Ok("Review added to product successfully");
+            return Ok(new { message = "Review added to product successfully" });
         }
 
-        [Route("api/store/products/{product_id}/reviews")]
+        // Endpoint to get the reviews of a product (route: api/store/products/{product_id}/reviews)
+        [Route("store/products/{product_id}/reviews")]
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetProductReviews(Guid product_id)
         {
-            var product = await _context.Products.Include(p => p.Reviews).ThenInclude(r => r.User).FirstOrDefaultAsync(p => p.Product_id == product_id);
-
-            if (product == null)
+            if (!_context.Products.Any(p => p.Product_id == product_id))
             {
-                return NotFound("Producto no encontrado.");
+                return NotFound(new { message = "Productnot found" });
             }
-
-            var reviews = product.Reviews.Select(r => new
-            {
-                r.Review_id,
-                r.Review_content,
-                r.Review_rate,
-                User = r.User.Username
-            });
+            var reviews = await _context.Reviews
+                .Where(r => r.Product_id == product_id)
+                .Include(r => r.User)
+                .Select(r => new ReviewDto
+                {
+                    user = r.User.Username,
+                    productId = product_id,
+                    rate = r.Review_rate ?? 0,
+                    comment = r.Review_content
+                })
+                .ToListAsync();
 
             return Ok(reviews);
         }
 
-        [Route("api/store/reviews/{review_id}")]
+        // Endpoint to delete the review of a product (route: api/store/products/{product_id}/reviews/remove)
+        [Route("store/products/{product_id}/reviews/remove")]
         [HttpDelete]
         [Authorize]
-        public async Task<IActionResult> DeleteReview(Guid review_id)
+        public async Task<IActionResult> DeleteReview(Guid product_id)
         {
-            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Review_id == review_id);
+            var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
+            var review = await _context.Reviews
+                .Where(r => r.User_id == Guid.Parse(userId))
+                .Where(r => r.Product_id == product_id)
+                .FirstOrDefaultAsync();
+
             if (review == null)
             {
-                return NotFound("Reseña no encontrada.");
+                return NotFound(new { message = "Review not found" });
             }
 
             _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
 
-            return Ok("Reseña eliminada exitosamente.");
+            return Ok(new { message = "Review deleted successfully" });
         }
     }
 }

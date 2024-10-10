@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Data.DTOs
 {
-    public class RatingDto
+    public class WishListDto
     {
-        public decimal Rate { get; set; }
-        public int Count { get; set; }
+        public Guid userId { get; set; }
+        public List<Guid> productList { get; set; }
     }
 }

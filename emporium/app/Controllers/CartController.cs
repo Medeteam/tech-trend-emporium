@@ -162,7 +162,7 @@ namespace App.Controllers
                 .Include(u => u.Cart)
                 .First();
             var product = _context.ProductsToCart
-                .Where(ptc => ptc.Product_id == request.productId)
+                .Where(ptc => ptc.Product_id == request.id)
                 .Where(ptc => ptc.Cart_id == userCart.Cart.Cart_id)
                 .FirstOrDefault();
 

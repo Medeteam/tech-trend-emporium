@@ -10,7 +10,7 @@ using Data.DTOs;
 namespace App.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api")]
     public class CategoryController : ControllerBase
     {
         private readonly DBContextTechEmporiumTrend _context;
@@ -20,8 +20,8 @@ namespace App.Controllers
             _context = context;
         }
 
-        [HttpGet("/category")]
-        [Authorize]
+        // Endpoint to get all categories (route: api/category)
+        [HttpGet("category")]
         public IActionResult GetCategories()
         {
             var categories = _context.Categories
@@ -36,8 +36,8 @@ namespace App.Controllers
             return Ok(categories);
         }
 
-        [HttpGet("/category/{id}")]
-        [Authorize]
+        // Endpoint to get a specific category (route: api/category/{id})
+        [HttpGet("category/{id}")]
         public IActionResult GetCategoryById(Guid id)
         {
             var category = _context.Categories
@@ -58,8 +58,9 @@ namespace App.Controllers
             return Ok(category);
         }
 
-        [HttpDelete("/category")]
-        [Authorize(Policy = "RequireAdminRole")]
+        // Endpoint to delete a category (route: api/category)
+        [HttpDelete("category")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> DeleteCategory([FromBody] Guid id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);
@@ -74,7 +75,9 @@ namespace App.Controllers
 
             return Ok(new { message = "Category deleted successfully" });
         }
-        [HttpPost("api/category")]
+
+        // Endpoint to create a category (route: api/category)
+        [HttpPost("category")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
@@ -92,7 +95,9 @@ namespace App.Controllers
             await _context.SaveChangesAsync();
             return Ok("Category created Successfully");
         }
-        [HttpPut("api/category")]
+
+        // Endpoint to modify a category (route: api/category)
+        [HttpPut("category")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto categoryDto)
         {

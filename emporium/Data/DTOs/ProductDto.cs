@@ -12,7 +12,7 @@ namespace Data.DTOs
 {
     public class ProductDto
     {
-        public required Guid id { get; set; }
+        public Guid? id { get; set; }
         public required string title { get; set; }
         public decimal price { get; set; }
         public string? description { get; set; }
