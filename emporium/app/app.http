@@ -1,6 +1,6 @@
 @app_HostAddress = http://localhost:5161
 
-GET {{app_HostAddress}}/weatherforecast/
+GET {{app_HostAddress}}/store/products
 Accept: application/json 
 
 ###

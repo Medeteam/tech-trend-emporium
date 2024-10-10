@@ -73,19 +73,33 @@ namespace app
             // Agregar servicios para FakeStoreService con HttpClient
             builder.Services.AddHttpClient<FakeStoreService>();
 
+            var hostAllowed = builder.Configuration.GetValue<string>("HostAllowed"); 
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins(hostAllowed).AllowAnyHeader().AllowAnyMethod();
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            // if (app.Environment.IsDevelopment())
+            //if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
+
             app.UseHttpsRedirection();
+
+            app.UseCors();
 
             // Use authentication and autorization services
             app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.MapControllers();
