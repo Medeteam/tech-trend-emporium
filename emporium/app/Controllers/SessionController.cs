@@ -9,6 +9,7 @@ using Data;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Cors;
 
 namespace App.Controllers
 {
@@ -31,6 +32,7 @@ namespace App.Controllers
 
         // Endpoint to log in all kind of users (route: api/login)
         [AllowAnonymous]
+        [EnableCors("AllowAll")]
         [HttpPost("api/login")]
         public IActionResult Login([FromBody] UserLoginDto userLogin)
         {
@@ -51,7 +53,7 @@ namespace App.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.None,
                     Expires = tokenExpiration, 
                     Secure = true
                 };
@@ -153,6 +155,7 @@ namespace App.Controllers
 
         // Endpoint to log out (route: api/logout)
         [HttpPost("api/logout")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public IActionResult Logout()
         {

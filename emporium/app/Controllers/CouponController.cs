@@ -22,7 +22,7 @@ namespace App.Controllers
 
         // POST: api/Coupons
         [HttpPost]
-        [Authorize(Policy = "RRequireEmployeeOrSuperiorRole")]
+        [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> CreateCoupon([FromBody] CreateCouponDto couponDto)
         {
             // Validación si el código ya existe
