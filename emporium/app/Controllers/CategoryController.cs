@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Data.DTOs;
+using Microsoft.AspNetCore.Cors;
 
 namespace App.Controllers
 {
@@ -60,6 +61,7 @@ namespace App.Controllers
 
         // Endpoint to delete a category (route: api/category)
         [HttpDelete("category")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> DeleteCategory([FromBody] Guid id)
         {
@@ -78,6 +80,7 @@ namespace App.Controllers
 
         // Endpoint to create a category (route: api/category)
         [HttpPost("category")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto categoryDto)
         {
@@ -98,6 +101,7 @@ namespace App.Controllers
 
         // Endpoint to modify a category (route: api/category)
         [HttpPut("category")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto categoryDto)
         {

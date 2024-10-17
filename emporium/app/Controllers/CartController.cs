@@ -3,6 +3,7 @@ using Data.DTOs;
 using Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -118,6 +119,7 @@ namespace App.Controllers
         // Endpoint to add a product to the cart (route: api/cart)
         [HttpPost]
         [Route("cart")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> AddProductToCart([FromBody] ProductRequestDto request)
         {
@@ -153,6 +155,7 @@ namespace App.Controllers
         // Endpoint to remove a product from cart (route: api/cart)
         [HttpDelete]
         [Route("cart")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> DeleteProductFromCart([FromBody] DeleteProductRequestDto request)
         {
@@ -179,6 +182,7 @@ namespace App.Controllers
         // Endpoint to change the quantity of a product in the cart (route: api/cart)
         [HttpPut]
         [Route("cart")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> ChangeProductQuantity([FromBody] ProductRequestDto request)
         {
@@ -217,6 +221,7 @@ namespace App.Controllers
         // Endpoint to add a coupon to the cart (route: api/cart)
         [HttpPost]
         [Route("cart/coupon")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> ApplyCoupon([FromBody] CouponRequestDto request)
         {
@@ -255,6 +260,7 @@ namespace App.Controllers
 
         [HttpDelete]
         [Route("cart/coupon")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> RemoveCoupon()
         {
