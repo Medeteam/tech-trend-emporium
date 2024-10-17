@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Data.DTOs;
+using Microsoft.AspNetCore.Cors;
 
 namespace App.Controllers
 {
@@ -106,6 +107,7 @@ namespace App.Controllers
 
         // Endpoint to delete a product (route: api/product)
         [HttpDelete("product")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> DeleteProduct([FromBody] DeleteProductRequestDto requestDto)
         {
@@ -124,6 +126,7 @@ namespace App.Controllers
 
         // Endpoint to create a product (route: api/product)
         [HttpPost("product")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDto productDto)
         {
@@ -157,6 +160,7 @@ namespace App.Controllers
 
         // Endpoint to update a product (route: api/product)
         [HttpPut("product")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDto productDto)
         {

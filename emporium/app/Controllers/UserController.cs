@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Data.DTOs;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Cors;
 
 namespace App.Controllers
 {
@@ -121,8 +122,9 @@ namespace App.Controllers
             return Ok(result);
         }
 
-        // Endpoint to delete an users (route: api/user)
+        // Endpoint to delete an user (route: api/user)
         [HttpDelete("user/{id}")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
@@ -145,6 +147,7 @@ namespace App.Controllers
 
         // Endpoint to modify all users (route: api/user)
         [HttpPut("user")]
+        [EnableCors("AllowAll")]
         [Authorize("RequireAdminRole")]
         public async Task<IActionResult> UpdateUser(UserDto userDto)
         {

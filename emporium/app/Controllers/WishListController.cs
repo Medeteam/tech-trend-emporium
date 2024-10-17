@@ -2,6 +2,7 @@
 using Data.DTOs;
 using Data.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -21,6 +22,7 @@ namespace App.Controllers
 
         // Endpoint to add a product to wishlist (route: api/{user}/wishlist/add/{productId})
         [HttpPost("{user}/wishlist/add/{productId}")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> AddProductToWishList(Guid user, Guid productId)
         {
@@ -88,6 +90,7 @@ namespace App.Controllers
 
         // Endpoint to delete a product from wishlist (route: api/{user}/wishlist/remove/{productId})
         [HttpDelete("{user}/wishlist/remove/{productId}")]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> RemoveProductFromWishList(Guid user, Guid productId)
         {

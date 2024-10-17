@@ -63,7 +63,8 @@ namespace App.Controllers
                 return Ok(new { 
                     token = token,
                     email = user.Email,
-                    username = user.Username
+                    username = user.Username,
+                    role = user.Role.RoleName
                 });
             }
 

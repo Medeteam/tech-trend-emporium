@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 namespace App.Controllers
 {
@@ -22,6 +23,7 @@ namespace App.Controllers
 
         // POST: api/Coupons
         [HttpPost]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
         public async Task<IActionResult> CreateCoupon([FromBody] CreateCouponDto couponDto)
         {

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Cors;
 
 namespace App.Controllers
 {
@@ -23,6 +24,7 @@ namespace App.Controllers
         // Endpoint to create users with Shopper role (route: api/Auth)
         [HttpPost]
         [Route("api/Auth")]
+        [EnableCors("AllowAll")]
         [AllowAnonymous] 
         public async Task<IActionResult> SignupShopper(UserSignupDto userDto)
         {
@@ -32,6 +34,7 @@ namespace App.Controllers
         // Ruta para crear un usuario de tipo Admin (ruta: api/Admin/Auth)
         [HttpPost]
         [Route("api/Admin/Auth")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> SignupAdmin(UserSignupDto userDto)
         {
@@ -41,6 +44,7 @@ namespace App.Controllers
         // Ruta para crear un usuario de tipo Employee (ruta: api/Employee/Auth)
         [HttpPost]
         [Route("api/Employee/Auth")]
+        [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> SignupEmployee(UserSignupDto userDto)
         {

@@ -2,6 +2,7 @@
 using Data.DTOs;
 using Data.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -22,6 +23,7 @@ namespace YourNamespace.Controllers
         // Endpoint add the review for a product (route: api/store/products/{product_id}/reviews/add)
         [Route("store/products/{product_id}/reviews/add")]
         [HttpPost]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> AddReview(Guid product_id,[FromBody] ReviewRequestDto reviewDto)
         {
@@ -66,6 +68,7 @@ namespace YourNamespace.Controllers
         // Endpoint to delete the review of a product (route: api/store/products/{product_id}/reviews/remove)
         [Route("store/products/{product_id}/reviews/remove")]
         [HttpDelete]
+        [EnableCors("AllowAll")]
         [Authorize]
         public async Task<IActionResult> DeleteReview(Guid product_id)
         {
