@@ -75,16 +75,12 @@ namespace app
 
             var hostAllowed = builder.Configuration.GetValue<string>("HostAllowed");
 
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(policy =>
-            //    {
-            //        policy.WithOrigins(hostAllowed).AllowAnyHeader().AllowAnyMethod();
-            //    });
-            //});
-
             builder.Services.AddCors(options =>
             {
+                options.AddDefaultPolicy(policy =>
+                    {
+                        policy.WithOrigins(hostAllowed).AllowAnyHeader().AllowAnyMethod();
+                    });
                 options.AddPolicy("AllowAll",
                     builder =>
                     {
@@ -98,11 +94,8 @@ namespace app
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
 
             app.UseHttpsRedirection();

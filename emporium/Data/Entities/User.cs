@@ -17,6 +17,12 @@ namespace Data.Entities
         [MaxLength(255)]
         public required string Email { get; set; }
 
+        [MaxLength(120)]
+        public required string SecurityQuestion { get; set; }
+
+        [MaxLength(255)]
+        public required string SecurityAnswer { get; set; }
+
         public DateTimeOffset Created_at { get; set; } = DateTimeOffset.Now;
 
         [ForeignKey("Role")]

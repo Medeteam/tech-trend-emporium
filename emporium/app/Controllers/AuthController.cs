@@ -76,8 +76,9 @@ namespace App.Controllers
                 Username = userDto.Username,
                 Email = userDto.Email,
                 Password = userDto.Password,
+                SecurityQuestion = userDto.Question,
+                SecurityAnswer = userDto.Answer,
                 Role = role
-                //Role_id = role.Role_id
             };
 
             var wishList = new WishList

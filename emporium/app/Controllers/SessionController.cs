@@ -60,8 +60,9 @@ namespace App.Controllers
                 var token = GenerateJWTToken(user, tokenExpiration);
 
                 Response.Cookies.Append("Authorization", token, cookieOptions); // Add token to the cookie
-                return Ok(new { 
+                return Ok(new {
                     token = token,
+                    id = user.User_id,
                     email = user.Email,
                     username = user.Username,
                     role = user.Role.RoleName
