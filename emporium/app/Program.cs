@@ -77,19 +77,24 @@ namespace app
 
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
-                    {
-                        policy.WithOrigins(hostAllowed).AllowAnyHeader().AllowAnyMethod();
-                    });
-                options.AddPolicy("AllowAll",
-                    builder =>
-                    {
-                        builder.WithOrigins("http://localhost:4200")
-                               .AllowAnyHeader()
-                               .AllowAnyMethod()
-                               .AllowCredentials();
-                    });
+                // Definimos una política llamada "AllowAll" para localhost
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .AllowCredentials();
+                });
+
+                // Otra política para el origen permitido configurado en "HostAllowed"
+                options.AddPolicy("AllowConfiguredHost", policy =>
+                {
+                    policy.WithOrigins(hostAllowed)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
             });
+
 
             var app = builder.Build();
 
@@ -100,7 +105,7 @@ namespace app
 
             app.UseHttpsRedirection();
 
-            app.UseCors();
+            app.UseCors("AllowAll");
 
             // Use authentication and autorization services
             app.UseAuthentication();
