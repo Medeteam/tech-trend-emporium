@@ -20,5 +20,6 @@ namespace Data.DTOs
         public string? image { get; set; }
         public RatingDto? rating { get; set; }
         public uint stock { get; set; }
+        public  DateTimeOffset? created { get; set; }
     }
 }
