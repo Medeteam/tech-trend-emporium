@@ -74,13 +74,6 @@ namespace app
             builder.Services.AddHttpClient<FakeStoreService>();
 
             var hostAllowed = builder.Configuration.GetValue<string>("HostAllowed");
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(policy =>
-            //    {
-            //        policy.WithOrigins(hostAllowed).AllowAnyHeader().AllowAnyMethod();
-            //    });
-            //});
 
             builder.Services.AddCors(options =>
             {
