@@ -184,6 +184,5 @@ namespace App.Controllers
             await _context.SaveChangesAsync();
             return Ok(new { message = "Product Updated Succesfully" });
         }
-
     }
 }

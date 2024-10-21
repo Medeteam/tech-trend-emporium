@@ -28,7 +28,7 @@ namespace Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Coupon_id")
+                    b.Property<Guid?>("Coupon_id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Coupon_name")
@@ -37,13 +37,13 @@ namespace Data.Migrations
                     b.Property<DateTimeOffset>("Created_at")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("Order")
+                    b.Property<Guid?>("Order")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("OrdersOrder_id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Shopping_status_id")
+                    b.Property<Guid?>("Shopping_status_id")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Cart_id");
@@ -187,7 +187,7 @@ namespace Data.Migrations
                     b.Property<Guid>("Product_id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.HasKey("Cart_id", "Product_id");
@@ -297,6 +297,16 @@ namespace Data.Migrations
                     b.Property<Guid>("Role_id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("SecurityAnswer")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("SecurityQuestion")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -334,9 +344,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.Entities.Coupon", "Coupon")
                         .WithMany()
-                        .HasForeignKey("Coupon_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Coupon_id");
 
                     b.HasOne("Data.Entities.Order", "Orders")
                         .WithMany()
@@ -344,9 +352,7 @@ namespace Data.Migrations
 
                     b.HasOne("Data.Entities.ShoppingStatus", "ShoppingStatus")
                         .WithMany()
-                        .HasForeignKey("Shopping_status_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Shopping_status_id");
 
                     b.Navigation("Coupon");
 
@@ -369,13 +375,13 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Entities.ProductToCart", b =>
                 {
                     b.HasOne("Data.Entities.Cart", "Cart")
-                        .WithMany()
+                        .WithMany("ProductToCart")
                         .HasForeignKey("Cart_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Data.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("ProductToCart")
                         .HasForeignKey("Product_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -442,8 +448,15 @@ namespace Data.Migrations
                     b.Navigation("WishList");
                 });
 
+            modelBuilder.Entity("Data.Entities.Cart", b =>
+                {
+                    b.Navigation("ProductToCart");
+                });
+
             modelBuilder.Entity("Data.Entities.Product", b =>
                 {
+                    b.Navigation("ProductToCart");
+
                     b.Navigation("ProductWishLists");
 
                     b.Navigation("Reviews");
