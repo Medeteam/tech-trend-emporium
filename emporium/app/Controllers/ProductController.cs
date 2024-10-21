@@ -47,7 +47,8 @@ namespace App.Controllers
                 category = p.Category.Category_name,
                 image = p.Image,
                 price = p.Price,
-                stock = p.Stock
+                stock = p.Stock,
+                created = p.Created_at
             }).ToList();
 
             var reviewsList = _context.Reviews.ToList();
