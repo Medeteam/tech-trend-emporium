@@ -19,6 +19,7 @@ namespace App.Controllers
         private readonly DBContextTechEmporiumTrend _context;
         private readonly string _jwtKey;
         private readonly string _jwtIssuer;
+        private readonly PasswordHasher<User> _passwordHasher;
 
         public SessionController(DBContextTechEmporiumTrend context)
         {
@@ -26,6 +27,7 @@ namespace App.Controllers
             DotNetEnv.Env.Load();
             _jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
             _jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+            _passwordHasher = new PasswordHasher<User>();
         }
 
         #region Login
@@ -36,7 +38,7 @@ namespace App.Controllers
         [HttpPost("api/login")]
         public IActionResult Login([FromBody] UserLoginDto userLogin)
         {
-            if(Request.Cookies.TryGetValue("Authorization", out string cookie))
+            if (Request.Cookies.TryGetValue("Authorization", out string cookie))
             {
                 var validToken = CheckValidTokenExpiration(cookie);
                 if (validToken)
@@ -54,13 +56,14 @@ namespace App.Controllers
                 {
                     HttpOnly = true,
                     SameSite = SameSiteMode.None,
-                    Expires = tokenExpiration, 
+                    Expires = tokenExpiration,
                     Secure = true
                 };
                 var token = GenerateJWTToken(user, tokenExpiration);
 
                 Response.Cookies.Append("Authorization", token, cookieOptions); // Add token to the cookie
-                return Ok(new {
+                return Ok(new
+                {
                     token = token,
                     id = user.User_id,
                     email = user.Email,
@@ -170,6 +173,40 @@ namespace App.Controllers
             {
                 return Ok(new { message = "User is not logged" });
             }
+        }
+
+        #endregion
+
+        #region RecoverPassword
+
+        [AllowAnonymous]
+        [EnableCors("AllowAll")]
+        [HttpPost("api/recover")]
+        public async Task<IActionResult> Recover([FromBody] UserRecoverDto userRecover)
+        {
+            if (Request.Cookies.TryGetValue("Authorization", out string cookie))
+            {
+                var validToken = CheckValidTokenExpiration(cookie);
+                if (validToken)
+                {
+                    return Conflict(new { message = "User alredy logged in" });
+                }
+            }
+            var existingUser = _context.Users.FirstOrDefault(u => u.Email == userRecover.email);
+            if (existingUser == null)
+            {
+                return Conflict("Not existing user");
+            }
+            if(existingUser.SecurityAnswer== userRecover.qAnswer)
+            {
+                existingUser.Password = userRecover.newPassword;
+                existingUser.Password = _passwordHasher.HashPassword(existingUser,existingUser.Password);
+                _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Password updated succesfully"});
+            }
+            return Conflict("Security Answer does not match");
+
         }
 
         #endregion
