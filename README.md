@@ -20,63 +20,63 @@
    git clone https://github.com/Medeteam/tech-trend-emporium.git
    ```
 
-## Paquetes Utilizados
+## Used Packages
 
-Este proyecto utiliza varios paquetes de NuGet para añadir funcionalidad clave a la aplicación. A continuación se enumeran los paquetes utilizados y una breve descripción de cada uno:
+This project uses several NuGet packages to add key functionality to the application. Listed below are the packages used and a brief description of each:
 
 ### 1. **DotNetEnv (3.1.1)**
-   - Este paquete permite la carga de variables de entorno desde un archivo `.env` en aplicaciones .NET. Es útil para almacenar configuraciones como cadenas de conexión de base de datos y claves API de forma segura fuera del código fuente.
+   - This package allows loading environment variables from a `.env` file in .NET applications. It is useful for storing settings such as database connection strings and API keys safely outside the source code.
 
 ### 2. **Microsoft.AspNetCore.Authentication.JwtBearer (8.0.8)**
-   - Implementa la autenticación basada en tokens JWT (JSON Web Token) en aplicaciones ASP.NET Core, lo que facilita la autenticación de usuarios en aplicaciones distribuidas y APIs.
+   - Implements JWT (JSON Web Token) token-based authentication in ASP.NET Core applications, facilitating user authentication in distributed applications and APIs.
 
 ### 3. **Microsoft.AspNetCore.Authorization (8.0.8)**
-   - Facilita la implementación de políticas de autorización para controlar el acceso a diferentes partes de la aplicación en función de roles y permisos de los usuarios.
+   - Facilitates the implementation of authorization policies to control access to different parts of the application based on user roles and permissions.
 
 ### 4. **Microsoft.AspNetCore.Mvc.NewtonsoftJson (8.0.8)**
-   - Integra `Newtonsoft.Json` en ASP.NET Core para manejar la serialización y deserialización de objetos JSON. Es utilizado principalmente para el intercambio de datos entre el cliente y el servidor.
+   - Integrates `Newtonsoft.Json` into ASP.NET Core to handle serialization and deserialization of JSON objects. It is mainly used for data exchange between client and server.
 
 ### 5. **Microsoft.EntityFrameworkCore (8.0.8)**
-   - Proporciona herramientas para interactuar con bases de datos utilizando el patrón ORM (Mapeo Relacional de Objetos) en .NET, facilitando la manipulación de datos sin necesidad de escribir consultas SQL directamente.
+   - It provides tools to interact with databases using the ORM (Object Relational Mapping) pattern in .NET, facilitating data manipulation without the need to write SQL queries directly.
 
 ### 6. **Microsoft.EntityFrameworkCore.Design (8.0.8)**
-   - Contiene herramientas necesarias para realizar migraciones y scaffolding de bases de datos cuando se trabaja con Entity Framework Core.
+   - It contains the necessary tools to perform database migrations and scaffolding when working with Entity Framework Core.
 
 ### 7. **Microsoft.EntityFrameworkCore.SqlServer (8.0.8)**
-   - Proveedor de Entity Framework Core para SQL Server, permite trabajar con bases de datos SQL Server a través de EF Core.
+   - Provider of Entity Framework Core for SQL Server, allows working with SQL Server databases through EF Core.
 
 ### 8. **Microsoft.Extensions.Http (8.0.0)**
-   - Proporciona mejoras para la gestión de peticiones HTTP, incluido el manejo de errores y la resiliencia a través de políticas de reintentos.
+   - Provides enhancements to HTTP request handling, including error handling and resiliency through retry policies.
 
 ### 9. **Microsoft.Extensions.Http.Polly (8.0.8)**
-   - Extiende `HttpClient` con capacidades de resiliencia a través de la integración con Polly, una biblioteca que ofrece funcionalidades como reintentos automáticos y manejo de fallos en solicitudes HTTP.
+   - Extends `HttpClient` with resiliency capabilities through integration with Polly, a library that provides features such as automatic retries and HTTP request failure handling.
 
 ### 10. **Microsoft.Extensions.Identity.Core (8.0.8)**
-   - Proporciona las funcionalidades centrales para la autenticación y gestión de usuarios, incluyendo la configuración de roles y permisos.
+   - Provides core functionality for authentication and user management, including role and permission settings.
 
 ### 11. **Swashbuckle.AspNetCore (6.7.3)**
-   - Herramienta que genera automáticamente una interfaz Swagger para la documentación de tus APIs ASP.NET Core, facilitando la exploración e interacción con las APIs desde un navegador.
+   - Tool that automatically generates a Swagger interface for the documentation of your ASP.NET Core APIs, facilitating the exploration and interaction with the APIs from a browser.
 
 
-## Herramientas de Pruebas y Análisis
+## Testing and Analysis Tools
 
 ### 1. **Bogus (35.6.1)**
-   - Generador de datos falsos que se utiliza para crear datos de prueba realistas, útil para pruebas unitarias y de integración.
+   - Dummy data generator used to create realistic test data, useful for unit and integration testing.
 
 ### 2. **coverlet.collector (6.0.0)**
-   - Herramienta para medir la cobertura de código durante las pruebas en .NET, ayudando a garantizar que el código esté adecuadamente probado.
+   - Tool to measure code coverage during .NET testing, helping to ensure that code is properly tested.
 
 ### 3. **Microsoft.EntityFrameworkCore.InMemory (8.0.8)**
-   - Proveedor de EF Core que permite simular una base de datos en memoria para realizar pruebas unitarias sin necesidad de una base de datos real.
+   - EF Core provider that allows simulating an in-memory database for unit testing without the need for a real database.
 
 ### 4. **xunit (2.5.3)**
-   - Marco de pruebas unitarias utilizado para escribir y ejecutar pruebas en aplicaciones .NET.
+   - Unit testing framework used to write and run tests on .NET applications.
 
 ### 5. **xunit.runner.visualstudio (2.5.3)**
-   - Integra xUnit con Visual Studio, permitiendo ejecutar y visualizar pruebas desde el entorno de desarrollo.
+   - Integrates xUnit with Visual Studio, allowing to run and visualize tests from the development environment.
 
 ### 6. **Microsoft.NET.Test.Sdk (17.8.0)**
-   - Herramienta que proporciona infraestructura para ejecutar pruebas en proyectos .NET, integrándose con varios marcos de pruebas como xUnit, NUnit, y MSTest.
+   - Tool that provides infrastructure to run tests in .NET projects, integrating with several testing frameworks such as xUnit, NUnit, and MSTest.
 
 # USAGE
 **To run the application locally, follow these steps:**
@@ -94,8 +94,19 @@ Este proyecto utiliza varios paquetes de NuGet para añadir funcionalidad clave 
 3. Access the Api
 - Access the API at [http://localhost:5161/swagger/index.html](http://localhost:5161/swagger/index.html)
 
-4. Data Base access
-- To request an acces to Data Base please contac Sebastian Arias Usma, Camilo Velez Palacio or Jhonatan Tamayo Morales Via Microsoft Teams
+4. Data Base creation
+- Install a DBMS of your liking that supports MySQL
+- Create a database
+- Create a dotenv file in the project
+- Update the .env file in the project, especifically the SQLSERVER_CONECTION_STRING so it reflects your server conection and the database name. example: SQLSERVER_CONNECTION_STRING="Server=yourservername;Database=yourdatabasename;Integrated Security=True;TrustServerCertificate=True;"
+- You need to update the .env with a property called JWT_KEY, it needs to be a string of 25 up to 40 characters
+- You need to update the .env file with a property called JWT_ISSUER, this property need to have a value that is a string containing localhost and the port that the app is running in in this case 5161
+- Using visual studio go to: Tools > Nuget package manager > Package console
+- Using the console that displayed type in the following command: add-migration migrationname
+- Wait till it finishes creating the migration
+- Use the following command on the same console: update-database
+- At this point you have the database created on your DBMS, you will need to use postman or swagger to populate the default Roles, Categories, Products and shopping statuses
+- If you have any problem with authorizations for the routes you can comment the "Authorize" decorator on any route necessary so you can bypass the required policy
 
 # Development Strategy
 This project follows the trunk-based development strategy with the following rules:
