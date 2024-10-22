@@ -63,9 +63,9 @@ namespace App.Controllers
         [HttpDelete("category")]
         [EnableCors("AllowAll")]
         [Authorize(Policy = "RequireEmployeeOrSuperiorRole")]
-        public async Task<IActionResult> DeleteCategory([FromBody] Guid id)
+        public async Task<IActionResult> DeleteCategory([FromBody] DeleteProductRequestDto req)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Category_id == id);
+            var category = _context.Categories.FirstOrDefault(c => c.Category_id == req.id);
 
             if (category == null)
             {
