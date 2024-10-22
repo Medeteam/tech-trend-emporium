@@ -84,6 +84,7 @@ namespace App.Controllers
                     {
                         id = ptc.Product_id,
                         title = ptc.Product.Name,
+                        description = ptc.Product.Description,
                         price = ptc.Product.Price,
                         image = ptc.Product.Image,
                         quantity = ptc.Quantity
@@ -154,18 +155,30 @@ namespace App.Controllers
 
         // Endpoint to remove a product from cart (route: api/cart)
         [HttpDelete]
-        [Route("cart")]
+        [Route("cart/{productId}")]
         [EnableCors("AllowAll")]
         [Authorize]
-        public async Task<IActionResult> DeleteProductFromCart([FromBody] DeleteProductRequestDto request)
+        public async Task<IActionResult> DeleteProductFromCart(Guid productId)
         {
             var userId = User.FindFirst(ClaimTypes.Sid)?.Value;
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
             var userCart = _context.Users
                 .Where(u => u.User_id == Guid.Parse(userId))
                 .Include(u => u.Cart)
-                .First();
+                .FirstOrDefault();
+
+            if (userCart == null)
+            {
+                return NotFound(new { message = "Cart not found" });
+            }
+
             var product = _context.ProductsToCart
-                .Where(ptc => ptc.Product_id == request.id)
+                .Where(ptc => ptc.Product_id == productId)
                 .Where(ptc => ptc.Cart_id == userCart.Cart.Cart_id)
                 .FirstOrDefault();
 
@@ -174,10 +187,12 @@ namespace App.Controllers
                 return NotFound(new { message = "This product is not added to the cart" });
             }
 
-            _context.Remove(product);
-            _context.SaveChanges();
+            _context.ProductsToCart.Remove(product);
+            await _context.SaveChangesAsync();
+
             return Ok(new { message = "Product removed from the cart" });
         }
+
 
         // Endpoint to change the quantity of a product in the cart (route: api/cart)
         [HttpPut]
