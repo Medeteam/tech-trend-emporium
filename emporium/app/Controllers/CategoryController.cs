@@ -96,7 +96,7 @@ namespace App.Controllers
             };
             _context.Categories.Add(newCategory);
             await _context.SaveChangesAsync();
-            return Ok("Category created Successfully");
+            return Created();
         }
 
         // Endpoint to modify a category (route: api/category)
